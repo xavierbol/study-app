@@ -44,4 +44,8 @@ export default defineComponent({});
 .justify-around {
   justify-content: space-around;
 }
+
+.justify-end {
+  justify-content: flex-end;
+}
 </style>

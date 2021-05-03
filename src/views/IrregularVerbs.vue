@@ -114,6 +114,12 @@
       <Button type="button" color="danger" @click="reset">Réinitialiser</Button>
     </div>
   </form>
+  <div class="flex justify-end">
+    <span class="nes-text">
+      {{ countRemainingVerbs ? countAnswers + 1 : countTotal }} /
+      {{ countTotal }}
+    </span>
+  </div>
 
   <dialog
     ref="dialogRef"
@@ -135,7 +141,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, Ref, ref } from "vue";
+import { computed, defineComponent, reactive, Ref, ref } from "vue";
 import Button from "@/components/Button.vue";
 import { IrregularVerb } from "@/store/state";
 import { useStore } from "vuex";
@@ -152,6 +158,15 @@ export default defineComponent({
     const dialogRef: Ref<HTMLDialogElement | null> = ref(null);
     const selectVerb = (): IrregularVerb =>
       $store.getters[GetterTypes.selectRandomVerb];
+    const countAnswers = computed(
+      (): number => $store.getters[GetterTypes.countAnswers]
+    );
+    const countTotal = computed(
+      (): number => $store.getters[GetterTypes.totalCount]
+    );
+    const countRemainingVerbs = computed(
+      () => $store.getters[GetterTypes.remainingCount]
+    );
     function selectRandomFieldName(): keyof IrregularVerb {
       const fieldNames = (Object.keys(verb) as Array<
         keyof IrregularVerb
@@ -239,6 +254,10 @@ export default defineComponent({
       fieldName,
       showErrors,
       dialogRef,
+
+      countAnswers,
+      countTotal,
+      countRemainingVerbs,
 
       invalidField,
       reset,
