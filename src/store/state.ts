@@ -11,14 +11,14 @@ export interface StateInterface {
   loading: boolean;
   verbs: IrregularVerb[];
   error?: string;
-  answers: Set<number>;
+  answers: Record<number, boolean>;
 }
 
 const defaultState: StateInterface = {
   loading: false,
   verbs: [],
   error: undefined,
-  answers: new Set(),
+  answers: {},
 };
 
 export default defaultState;

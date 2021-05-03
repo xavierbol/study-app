@@ -114,7 +114,23 @@
       <Button type="button" color="danger" @click="reset">Réinitialiser</Button>
     </div>
   </form>
-  <div class="flex justify-end">
+  <div class="flex justify-between">
+    <div v-if="countAnswers <= 10">
+      <i
+        v-for="(answer, index) in getAnswers"
+        :key="index"
+        :class="`nes-icon ${answer ? 'coin' : 'close'}`"
+      ></i>
+    </div>
+    <div v-else>
+      <span v-if="getAnswers.includes(true)" class="nes-text">
+        <i class="nes-icon coin"></i> x {{ getAnswers.filter((a) => a).length }}
+      </span>
+      <span v-else class="nes-text">
+        <i class="nes-icon close"></i> x
+        {{ getAnswers.filter((a) => !a).length }}
+      </span>
+    </div>
     <span class="nes-text">
       {{ countRemainingVerbs ? countAnswers + 1 : countTotal }} /
       {{ countTotal }}
@@ -158,6 +174,9 @@ export default defineComponent({
     const dialogRef: Ref<HTMLDialogElement | null> = ref(null);
     const selectVerb = (): IrregularVerb =>
       $store.getters[GetterTypes.selectRandomVerb];
+    const getAnswers = computed(
+      (): Array<boolean> => $store.getters[GetterTypes.getAnswers]
+    );
     const countAnswers = computed(
       (): number => $store.getters[GetterTypes.countAnswers]
     );
@@ -224,13 +243,13 @@ export default defineComponent({
     }
 
     function onSubmit(): void {
-      $store.commit(MutationType.AddAnswer, verb.id);
       showErrors.value =
         !checkAnswer(form.infinitive, verb.infinitive) ||
         !checkAnswer(form.past_simple, verb.past_simple) ||
         !checkAnswer(form.past_simple_2, verb.past_simple_2) ||
         !checkAnswer(form.past_participle, verb.past_participle) ||
         !checkAnswer(form.translation, verb.translation);
+      $store.commit(MutationType.AddAnswer, [verb.id, !showErrors.value]);
       if (!showErrors.value) {
         const remainingCount = $store.getters[GetterTypes.remainingCount];
         if (remainingCount > 0) {
@@ -258,6 +277,7 @@ export default defineComponent({
       countAnswers,
       countTotal,
       countRemainingVerbs,
+      getAnswers,
 
       invalidField,
       reset,

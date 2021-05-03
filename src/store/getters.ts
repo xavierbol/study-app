@@ -8,6 +8,7 @@ export enum GetterTypes {
   remainingVerbs = "GET_REMAINING_VERBS",
   selectIrregularVerbById = "SELECT_IRREGULAR_VERB_BY_ID",
   selectRandomVerb = "SELECT_RANDOM_VERB",
+  getAnswers = "GET_ANSWERS",
 }
 
 const getters: GetterTree<StateInterface, StateInterface> = {
@@ -15,14 +16,14 @@ const getters: GetterTree<StateInterface, StateInterface> = {
     return state.verbs.length;
   },
   [GetterTypes.countAnswers](state) {
-    return state.answers.size;
+    return Object.keys(state.answers).length;
   },
   [GetterTypes.remainingCount](state, getters) {
     return getters[GetterTypes.totalCount] - getters[GetterTypes.countAnswers];
   },
   [GetterTypes.remainingVerbs](state, getters) {
     if (getters[GetterTypes.countAnswers] === 0) return state.verbs;
-    return state.verbs.filter((v) => !state.answers.has(v.id));
+    return state.verbs.filter((v) => !state.answers.hasOwnProperty(v.id));
   },
   [GetterTypes.selectIrregularVerbById](state) {
     return (id: number) => state.verbs.find((verb) => verb.id === id);
@@ -37,6 +38,9 @@ const getters: GetterTree<StateInterface, StateInterface> = {
       Math.floor(Math.random() * remainingVerbsToDo);
     const index = random();
     return remainingVerbs[index];
+  },
+  [GetterTypes.getAnswers](state) {
+    return Object.values(state.answers);
   },
 };
 
