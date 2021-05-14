@@ -126,7 +126,7 @@
       <span v-if="getAnswers.includes(true)" class="nes-text">
         <i class="nes-icon coin"></i> x {{ getAnswers.filter((a) => a).length }}
       </span>
-      <span v-else class="nes-text">
+      <span v-if="getAnswers.includes(false)" class="nes-text">
         <i class="nes-icon close"></i> x
         {{ getAnswers.filter((a) => !a).length }}
       </span>
@@ -219,6 +219,15 @@ export default defineComponent({
     function checkAnswer(actualVerb: string, expectedVerb: string): boolean {
       if (expectedVerb.includes(",")) {
         const listAnswers = expectedVerb.split(",").map((v) => v.trim());
+        if (actualVerb.includes(",")) {
+          const listResponse = [
+            ...new Set(actualVerb.split(",").map((v) => v.trim())),
+          ];
+          return (
+            listResponse.length === listAnswers.length &&
+            listResponse.every((v) => listAnswers.includes(v))
+          );
+        }
         return listAnswers.includes(actualVerb);
       } else {
         return expectedVerb === actualVerb;
@@ -244,11 +253,16 @@ export default defineComponent({
 
     function onSubmit(): void {
       showErrors.value =
-        !checkAnswer(form.infinitive, verb.infinitive) ||
-        !checkAnswer(form.past_simple, verb.past_simple) ||
-        !checkAnswer(form.past_simple_2, verb.past_simple_2) ||
-        !checkAnswer(form.past_participle, verb.past_participle) ||
-        !checkAnswer(form.translation, verb.translation);
+        (fieldName.value !== "infinitive" &&
+          !checkAnswer(form.infinitive, verb.infinitive)) ||
+        (fieldName.value !== "past_simple" &&
+          !checkAnswer(form.past_simple, verb.past_simple)) ||
+        (fieldName.value !== "past_simple_2" &&
+          !checkAnswer(form.past_simple_2, verb.past_simple_2)) ||
+        (fieldName.value !== "past_participle" &&
+          !checkAnswer(form.past_participle, verb.past_participle)) ||
+        (fieldName.value !== "translation" &&
+          !checkAnswer(form.translation, verb.translation));
       $store.commit(MutationType.AddAnswer, [verb.id, !showErrors.value]);
       if (!showErrors.value) {
         const remainingCount = $store.getters[GetterTypes.remainingCount];
