@@ -45,6 +45,10 @@ export default defineComponent({});
   justify-content: space-around;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .justify-end {
   justify-content: flex-end;
 }

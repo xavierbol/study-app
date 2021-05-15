@@ -7,11 +7,13 @@ export type IrregularVerb = {
   translation: string;
 };
 
+export type Answer = IrregularVerb & { correct: boolean };
+
 export interface StateInterface {
   loading: boolean;
   verbs: IrregularVerb[];
   error?: string;
-  answers: Record<number, boolean>;
+  answers: Record<number, Answer>;
 }
 
 const defaultState: StateInterface = {

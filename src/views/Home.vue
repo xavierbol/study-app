@@ -6,6 +6,13 @@
       <Button to="/nl/verbe-irreguliers">
         Verbes irréguliers en néerlandais
       </Button>
+      <Button to="/nl/vocabulaires" disabled>
+        Vocabulaires en néerlandais
+      </Button>
+      <Button to="/en/verbe-irreguliers" disabled>
+        Verbes irréguliers en anglais
+      </Button>
+      <Button to="/en/vocabulaires" disabled>Vocabulaires en anglais</Button>
     </div>
   </section>
 </template>

@@ -1,5 +1,5 @@
 import { MutationTree } from "vuex";
-import { IrregularVerb, StateInterface } from "./state";
+import { Answer, IrregularVerb, StateInterface } from "./state";
 
 export enum MutationType {
   CreateIrregularVerb = "CREATE_IRREGULAR_VERB",
@@ -42,7 +42,7 @@ const mutations: MutationTree<StateInterface> = {
     };
     state.error = undefined;
   },
-  [MutationType.AddAnswer](state: StateInterface, answer: [number, boolean]) {
+  [MutationType.AddAnswer](state: StateInterface, answer: [number, Answer]) {
     if (state.answers.hasOwnProperty(answer[0])) {
       return;
     }

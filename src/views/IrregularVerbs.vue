@@ -123,10 +123,10 @@
       ></i>
     </div>
     <div v-else>
-      <span v-if="getAnswers.includes(true)" class="nes-text">
+      <span v-if="containGoodAnswers" class="nes-text">
         <i class="nes-icon coin"></i> x {{ getAnswers.filter((a) => a).length }}
       </span>
-      <span v-if="getAnswers.includes(false)" class="nes-text">
+      <span v-if="containErrors" class="nes-text">
         <i class="nes-icon close"></i> x
         {{ getAnswers.filter((a) => !a).length }}
       </span>
@@ -148,18 +148,33 @@
       tous les verbes irréguliers <br />
       de cet exercice.
     </p>
+    <p class="text-center" v-if="containErrors">
+      Voulez-vous réviser vos erreurs ?
+    </p>
     <menu class="dialog-menu flex justify-around">
-      <button class="nes-btn is-primary" @click="onConfirmDialog">
-        Confirmer
+      <button
+        v-if="containErrors"
+        class="nes-btn is-primary"
+        @click="onResumeErrors"
+      >
+        Oui
       </button>
+      <button class="nes-btn is-secondary" @click="onReturnMenu">Non</button>
     </menu>
   </dialog>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, Ref, ref } from "vue";
+import {
+  computed,
+  ComputedRef,
+  defineComponent,
+  reactive,
+  Ref,
+  ref,
+} from "vue";
 import Button from "@/components/Button.vue";
-import { IrregularVerb } from "@/store/state";
+import { Answer, IrregularVerb } from "@/store/state";
 import { useStore } from "vuex";
 import { GetterTypes } from "@/store/getters";
 import { useRouter } from "vue-router";
@@ -175,7 +190,7 @@ export default defineComponent({
     const selectVerb = (): IrregularVerb =>
       $store.getters[GetterTypes.selectRandomVerb];
     const getAnswers = computed(
-      (): Array<boolean> => $store.getters[GetterTypes.getAnswers]
+      (): Array<Answer> => $store.getters[GetterTypes.getAnswers]
     );
     const countAnswers = computed(
       (): number => $store.getters[GetterTypes.countAnswers]
@@ -195,6 +210,12 @@ export default defineComponent({
       ] as keyof IrregularVerb;
     }
 
+    const containGoodAnswers = computed(
+      (): boolean => getAnswers.value.findIndex((a) => a.correct) !== -1
+    );
+    const containErrors = computed(
+      (): boolean => getAnswers.value.findIndex((a) => !a.correct) !== -1
+    );
     let verb = reactive<IrregularVerb>(selectVerb());
     let fieldName = ref(selectRandomFieldName());
     const form = reactive<IrregularVerb>(
@@ -263,7 +284,10 @@ export default defineComponent({
           !checkAnswer(form.past_participle, verb.past_participle)) ||
         (fieldName.value !== "translation" &&
           !checkAnswer(form.translation, verb.translation));
-      $store.commit(MutationType.AddAnswer, [verb.id, !showErrors.value]);
+      $store.commit(MutationType.AddAnswer, [
+        verb.id,
+        { ...form, correct: !showErrors.value },
+      ]);
       if (!showErrors.value) {
         const remainingCount = $store.getters[GetterTypes.remainingCount];
         if (remainingCount > 0) {
@@ -271,7 +295,6 @@ export default defineComponent({
           fieldName.value = selectRandomFieldName();
           reset();
         } else {
-          $store.commit(MutationType.ClearAnswer);
           if (dialogRef.value) {
             dialogRef.value.showModal();
           } else {
@@ -292,12 +315,19 @@ export default defineComponent({
       countTotal,
       countRemainingVerbs,
       getAnswers,
+      containGoodAnswers,
+      containErrors,
 
       invalidField,
       reset,
       onSubmit,
 
-      onConfirmDialog() {
+      onResumeErrors() {
+        $router.push({ name: "ResumeErrors" });
+      },
+
+      onReturnMenu() {
+        $store.commit(MutationType.ClearAnswer);
         $router.push("/");
       },
     };

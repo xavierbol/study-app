@@ -1,5 +1,5 @@
 import { GetterTree } from "vuex";
-import { StateInterface } from "./state";
+import { StateInterface, IrregularVerb } from "./state";
 
 export enum GetterTypes {
   totalCount = "COUNT_TOTAL",
@@ -9,6 +9,7 @@ export enum GetterTypes {
   selectIrregularVerbById = "SELECT_IRREGULAR_VERB_BY_ID",
   selectRandomVerb = "SELECT_RANDOM_VERB",
   getAnswers = "GET_ANSWERS",
+  getCorrections = "GET_CORRECTIONS",
 }
 
 const getters: GetterTree<StateInterface, StateInterface> = {
@@ -41,6 +42,19 @@ const getters: GetterTree<StateInterface, StateInterface> = {
   },
   [GetterTypes.getAnswers](state) {
     return Object.values(state.answers);
+  },
+  [GetterTypes.getCorrections](state, getters) {
+    const verbs = state.verbs;
+    const answers = getters[GetterTypes.getAnswers];
+    const corrections: Array<[IrregularVerb, IrregularVerb]> = [];
+    answers.forEach((answer: IrregularVerb & { correct: boolean }) => {
+      const verb = answer as IrregularVerb;
+      if (!answer.correct) {
+        const expectedVerb = verbs.find((v) => v.id === answer.id);
+        expectedVerb && corrections.push([verb, expectedVerb]);
+      }
+    });
+    return corrections;
   },
 };
 

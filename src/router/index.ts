@@ -26,6 +26,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import(/* webpackChunkName: "lang" */ "../views/IrregularVerbs.vue"),
       },
+      {
+        name: "ResumeErrors",
+        path: "revision_erreurs",
+        component: () =>
+          import(
+            /* webpackChunkName: "resume_errors" */ "../views/ResumeErrors.vue"
+          ),
+      },
     ],
   },
 ];
