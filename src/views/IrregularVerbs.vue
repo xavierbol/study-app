@@ -124,11 +124,12 @@
     </div>
     <div v-else>
       <span v-if="containGoodAnswers" class="nes-text">
-        <i class="nes-icon coin"></i> x {{ getAnswers.filter((a) => a).length }}
+        <i class="nes-icon coin"></i> x
+        {{ getAnswers.filter((a) => a.correct).length }}
       </span>
       <span v-if="containErrors" class="nes-text">
         <i class="nes-icon close"></i> x
-        {{ getAnswers.filter((a) => !a).length }}
+        {{ getAnswers.filter((a) => !a.correct).length }}
       </span>
     </div>
     <span class="nes-text">
