@@ -42,11 +42,11 @@ const mutations: MutationTree<StateInterface> = {
     };
     state.error = undefined;
   },
-  [MutationType.AddAnswer](state: StateInterface, answer: [number, Answer]) {
-    if (state.answers.hasOwnProperty(answer[0])) {
+  [MutationType.AddAnswer](state: StateInterface, answer: Answer) {
+    if (state.answers.hasOwnProperty(answer.id)) {
       return;
     }
-    state.answers[answer[0]] = answer[1];
+    state.answers[answer.id] = answer;
     state.error = undefined;
   },
   [MutationType.ClearAnswer](state: StateInterface) {

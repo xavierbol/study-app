@@ -34,11 +34,8 @@ const getters: GetterTree<StateInterface, StateInterface> = {
     if (remainingVerbsToDo === 0) return null;
     const remainingVerbs = getters[GetterTypes.remainingVerbs];
     if (remainingVerbsToDo === 1) return remainingVerbs[0];
-    const random = () =>
-      // return a number in this interval: [0; totalCount[
-      Math.floor(Math.random() * remainingVerbsToDo);
-    const index = random();
-    return remainingVerbs[index];
+    // return a number in this interval: [0; totalCount[
+    return remainingVerbs[Math.floor(Math.random() * remainingVerbsToDo)];
   },
   [GetterTypes.getAnswers](state) {
     return Object.values(state.answers);

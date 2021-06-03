@@ -24,3 +24,13 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.text-green {
+  color: green;
+}
+
+.text-red {
+  color: red;
+}
+</style>

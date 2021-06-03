@@ -119,7 +119,7 @@
       <i
         v-for="(answer, index) in getAnswers"
         :key="index"
-        :class="`nes-icon ${answer ? 'coin' : 'close'}`"
+        :class="`nes-icon ${answer.correct ? 'coin' : 'close'}`"
       ></i>
     </div>
     <div v-else>
@@ -166,14 +166,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  ComputedRef,
-  defineComponent,
-  reactive,
-  Ref,
-  ref,
-} from "vue";
+import { computed, defineComponent, reactive, Ref, ref } from "vue";
 import Button from "@/components/Button.vue";
 import { Answer, IrregularVerb } from "@/store/state";
 import { useStore } from "vuex";
@@ -217,7 +210,7 @@ export default defineComponent({
     const containErrors = computed(
       (): boolean => getAnswers.value.findIndex((a) => !a.correct) !== -1
     );
-    let verb = reactive<IrregularVerb>(selectVerb());
+    let verb = selectVerb();
     let fieldName = ref(selectRandomFieldName());
     const form = reactive<IrregularVerb>(
       Object.assign(
@@ -256,6 +249,22 @@ export default defineComponent({
       }
     }
 
+    function findFirstInputIdToEdit() {
+      const fieldNames = [
+        "infinitive",
+        "past_simple",
+        "past_simple_2",
+        "past_participle",
+        "translation",
+      ];
+      for (const field in fieldNames) {
+        if (field !== fieldName.value) {
+          return field;
+        }
+      }
+      return null;
+    }
+
     function reset(): void {
       Object.assign(
         form,
@@ -271,6 +280,8 @@ export default defineComponent({
       );
 
       showErrors.value = false;
+      const inputId = findFirstInputIdToEdit();
+      inputId && document.getElementById(inputId)?.focus();
     }
 
     function onSubmit(): void {
@@ -285,14 +296,13 @@ export default defineComponent({
           !checkAnswer(form.past_participle, verb.past_participle)) ||
         (fieldName.value !== "translation" &&
           !checkAnswer(form.translation, verb.translation));
-      $store.commit(MutationType.AddAnswer, [
-        verb.id,
-        { ...form, correct: !showErrors.value },
-      ]);
+      $store.commit(MutationType.AddAnswer, {
+        ...form,
+        correct: !showErrors.value,
+      });
       if (!showErrors.value) {
-        const remainingCount = $store.getters[GetterTypes.remainingCount];
-        if (remainingCount > 0) {
-          Object.assign(verb, { ...selectVerb() });
+        if (countRemainingVerbs.value > 0) {
+          verb = selectVerb();
           fieldName.value = selectRandomFieldName();
           reset();
         } else {
