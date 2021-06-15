@@ -43,11 +43,13 @@ const mutations: MutationTree<StateInterface> = {
     state.error = undefined;
   },
   [MutationType.AddAnswer](state: StateInterface, answer: Answer) {
+    if (answer.correct) {
+      state.exerciceDoneIds.push(answer.id);
+    }
     if (state.answers.hasOwnProperty(answer.id)) {
       return;
     }
     state.answers[answer.id] = answer;
-    state.error = undefined;
   },
   [MutationType.ClearAnswer](state: StateInterface) {
     state.answers = {};

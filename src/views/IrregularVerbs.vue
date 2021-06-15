@@ -181,8 +181,9 @@ export default defineComponent({
     const $router = useRouter();
 
     const dialogRef: Ref<HTMLDialogElement | null> = ref(null);
-    const selectVerb = (): IrregularVerb =>
-      $store.getters[GetterTypes.selectRandomVerb];
+    const verb = computed<IrregularVerb>(
+      (): IrregularVerb => $store.getters[GetterTypes.selectRandomVerb]
+    );
     const getAnswers = computed(
       (): Array<Answer> => $store.getters[GetterTypes.getAnswers]
     );
@@ -196,9 +197,9 @@ export default defineComponent({
       () => $store.getters[GetterTypes.remainingCount]
     );
     function selectRandomFieldName(): keyof IrregularVerb {
-      const fieldNames = (Object.keys(verb) as Array<
+      const fieldNames = (Object.keys(verb.value) as Array<
         keyof IrregularVerb
-      >).filter((key) => key !== "id" && verb[key]);
+      >).filter((key) => key !== "id" && verb.value[key]);
       return fieldNames[
         Math.floor(Math.random() * fieldNames.length)
       ] as keyof IrregularVerb;
@@ -210,25 +211,24 @@ export default defineComponent({
     const containErrors = computed(
       (): boolean => getAnswers.value.findIndex((a) => !a.correct) !== -1
     );
-    let verb = selectVerb();
     let fieldName = ref(selectRandomFieldName());
     const form = reactive<IrregularVerb>(
       Object.assign(
         {
-          id: verb.id,
+          id: verb.value.id,
           infinitive: "",
           past_simple: "",
           past_simple_2: "",
           past_participle: "",
           translation: "",
         },
-        { [fieldName.value]: verb[fieldName.value] }
+        { [fieldName.value]: verb.value[fieldName.value] }
       )
     );
     const showErrors = ref(false);
 
     function invalidField(fieldName: keyof IrregularVerb) {
-      return showErrors.value && form[fieldName] !== verb[fieldName];
+      return showErrors.value && form[fieldName] !== verb.value[fieldName];
     }
 
     function checkAnswer(actualVerb: string, expectedVerb: string): boolean {
@@ -257,7 +257,7 @@ export default defineComponent({
         "past_participle",
         "translation",
       ];
-      for (const field in fieldNames) {
+      for (const field of fieldNames) {
         if (field !== fieldName.value) {
           return field;
         }
@@ -269,14 +269,14 @@ export default defineComponent({
       Object.assign(
         form,
         {
-          id: verb.id,
+          id: verb.value.id,
           infinitive: "",
           past_simple: "",
           past_simple_2: "",
           past_participle: "",
           translation: "",
         },
-        { [fieldName.value]: verb[fieldName.value] }
+        { [fieldName.value]: verb.value[fieldName.value] }
       );
 
       showErrors.value = false;
@@ -287,22 +287,21 @@ export default defineComponent({
     function onSubmit(): void {
       showErrors.value =
         (fieldName.value !== "infinitive" &&
-          !checkAnswer(form.infinitive, verb.infinitive)) ||
+          !checkAnswer(form.infinitive, verb.value.infinitive)) ||
         (fieldName.value !== "past_simple" &&
-          !checkAnswer(form.past_simple, verb.past_simple)) ||
+          !checkAnswer(form.past_simple, verb.value.past_simple)) ||
         (fieldName.value !== "past_simple_2" &&
-          !checkAnswer(form.past_simple_2, verb.past_simple_2)) ||
+          !checkAnswer(form.past_simple_2, verb.value.past_simple_2)) ||
         (fieldName.value !== "past_participle" &&
-          !checkAnswer(form.past_participle, verb.past_participle)) ||
+          !checkAnswer(form.past_participle, verb.value.past_participle)) ||
         (fieldName.value !== "translation" &&
-          !checkAnswer(form.translation, verb.translation));
+          !checkAnswer(form.translation, verb.value.translation));
       $store.commit(MutationType.AddAnswer, {
         ...form,
         correct: !showErrors.value,
       });
       if (!showErrors.value) {
         if (countRemainingVerbs.value > 0) {
-          verb = selectVerb();
           fieldName.value = selectRandomFieldName();
           reset();
         } else {

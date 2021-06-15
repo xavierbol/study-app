@@ -14,6 +14,7 @@ export interface StateInterface {
   verbs: IrregularVerb[];
   error?: string;
   answers: Record<number, Answer>;
+  exerciceDoneIds: Array<number>;
 }
 
 const defaultState: StateInterface = {
@@ -21,6 +22,7 @@ const defaultState: StateInterface = {
   verbs: [],
   error: undefined,
   answers: {},
+  exerciceDoneIds: [],
 };
 
 export default defaultState;

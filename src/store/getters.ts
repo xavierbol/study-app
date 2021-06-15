@@ -20,11 +20,11 @@ const getters: GetterTree<StateInterface, StateInterface> = {
     return Object.keys(state.answers).length;
   },
   [GetterTypes.remainingCount](state, getters) {
-    return getters[GetterTypes.totalCount] - getters[GetterTypes.countAnswers];
+    return getters[GetterTypes.totalCount] - state.exerciceDoneIds.length;
   },
   [GetterTypes.remainingVerbs](state, getters) {
-    if (getters[GetterTypes.countAnswers] === 0) return state.verbs;
-    return state.verbs.filter((v) => !state.answers.hasOwnProperty(v.id));
+    if (state.exerciceDoneIds.length === 0) return state.verbs;
+    return state.verbs.filter((v) => !state.exerciceDoneIds.includes(v.id));
   },
   [GetterTypes.selectIrregularVerbById](state) {
     return (id: number) => state.verbs.find((verb) => verb.id === id);
