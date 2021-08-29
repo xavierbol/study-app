@@ -7,54 +7,55 @@
   </button>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, defineProps } from "vue";
 
-export default defineComponent({
-  props: {
-    name: {
-      type: String,
-      default: "btn",
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    color: {
-      type: String,
-      validator: (value: string) =>
-        ["primary", "success", "warning", "danger"].indexOf(value) !== -1,
-    },
-    to: String,
+const props = defineProps({
+  name: {
+    type: String,
+    default: "btn",
   },
-  setup(props) {
-    const btnClass = computed(() => {
-      let className = "";
-
-      if (props.disabled) {
-        className = "is-disabled";
-      } else {
-        switch (props.color) {
-          case "primary":
-            className = "is-primary";
-            break;
-          case "success":
-            className = "is-success";
-            break;
-          case "warning":
-            className = "is-warning";
-            break;
-          case "danger":
-            className = "is-error";
-            break;
-          default:
-            className = "";
-        }
-      }
-
-      return `nes-btn ${className}`.trimEnd();
-    });
-    return { btnClass };
+  disabled: {
+    type: Boolean,
+    default: false,
   },
+  color: {
+    type: String,
+    validator: (value: string) =>
+      ["primary", "secondary", "success", "warning", "danger"].indexOf(
+        value
+      ) !== -1,
+  },
+  to: String,
+});
+
+const btnClass = computed(() => {
+  let className = "";
+
+  if (props.disabled) {
+    className = "is-disabled";
+  } else {
+    switch (props.color) {
+      case "primary":
+        className = "is-primary";
+        break;
+      case "secondary":
+        className = "is-secondary";
+        break;
+      case "success":
+        className = "is-success";
+        break;
+      case "warning":
+        className = "is-warning";
+        break;
+      case "danger":
+        className = "is-error";
+        break;
+      default:
+        className = "";
+    }
+  }
+
+  return `nes-btn ${className}`.trimEnd();
 });
 </script>

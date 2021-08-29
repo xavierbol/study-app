@@ -17,14 +17,8 @@
   </section>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
 import Button from "@/components/Button.vue";
-
-export default defineComponent({
-  name: "Home",
-  components: { Button },
-});
 </script>
 
 <style lang="scss" scoped>

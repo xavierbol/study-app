@@ -28,32 +28,24 @@
   </div>
 </template>
 
-<script lang="ts">
-import { GetterTypes } from "@/store/getters";
-import { IrregularVerb } from "@/store/state";
-import { defineComponent } from "vue";
+<script lang="ts" setup>
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import CorrectionElement from "@/components/CorrectionElement.vue";
+
+import { GetterTypes } from "@/store/getters";
+import { IrregularVerb } from "@/store/state";
 import { MutationType } from "@/store/mutations";
 
-export default defineComponent({
-  components: { CorrectionElement },
-  setup() {
-    const $store = useStore();
-    const $router = useRouter();
+import CorrectionElement from "@/components/CorrectionElement.vue";
 
-    const listCorrections: Array<[IrregularVerb, IrregularVerb]> =
-      $store.getters[GetterTypes.getCorrections];
+const $store = useStore();
+const $router = useRouter();
 
-    return {
-      listCorrections,
+const listCorrections: Array<[IrregularVerb, IrregularVerb]> =
+  $store.getters[GetterTypes.getCorrections];
 
-      onReturnMenu() {
-        $store.commit(MutationType.ClearAnswer);
-        $router.push("/");
-      },
-    };
-  },
-});
+function onReturnMenu() {
+  $store.commit(MutationType.ClearAnswer);
+  $router.push("/");
+}
 </script>

@@ -14,19 +14,11 @@
   </form>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  setup() {
-    return {
-      onSubmit(): void {
-        return;
-      },
-      onReset(): void {
-        return;
-      },
-    };
-  },
-});
+<script lang="ts" setup>
+function onSubmit(): void {
+  return;
+}
+function onReset(): void {
+  return;
+}
 </script>

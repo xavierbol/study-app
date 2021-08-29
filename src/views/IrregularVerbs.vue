@@ -153,20 +153,16 @@
       Voulez-vous réviser vos erreurs ?
     </p>
     <menu class="dialog-menu flex justify-around">
-      <button
-        v-if="containErrors"
-        class="nes-btn is-primary"
-        @click="onResumeErrors"
-      >
+      <Button v-if="containErrors" color="primary" @click="onResumeErrors">
         Oui
-      </button>
-      <button class="nes-btn is-secondary" @click="onReturnMenu">Non</button>
+      </Button>
+      <Button color="secondary" @click="onReturnMenu">Non</Button>
     </menu>
   </dialog>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, reactive, Ref, ref } from "vue";
+<script lang="ts" setup>
+import { computed, reactive, Ref, ref } from "vue";
 import Button from "@/components/Button.vue";
 import { Answer, IrregularVerb } from "@/store/state";
 import { useStore } from "vuex";
@@ -174,175 +170,151 @@ import { GetterTypes } from "@/store/getters";
 import { useRouter } from "vue-router";
 import { MutationType } from "@/store/mutations";
 
-export default defineComponent({
-  components: { Button },
-  setup() {
-    const $store = useStore();
-    const $router = useRouter();
+const $store = useStore();
+const $router = useRouter();
 
-    const dialogRef: Ref<HTMLDialogElement | null> = ref(null);
-    const verb = computed<IrregularVerb>(
-      (): IrregularVerb => $store.getters[GetterTypes.selectRandomVerb]
-    );
-    const getAnswers = computed(
-      (): Array<Answer> => $store.getters[GetterTypes.getAnswers]
-    );
-    const countAnswers = computed(
-      (): number => $store.getters[GetterTypes.countAnswers]
-    );
-    const countTotal = computed(
-      (): number => $store.getters[GetterTypes.totalCount]
-    );
-    const countRemainingVerbs = computed(
-      () => $store.getters[GetterTypes.remainingCount]
-    );
-    function selectRandomFieldName(): keyof IrregularVerb {
-      const fieldNames = (Object.keys(verb.value) as Array<
-        keyof IrregularVerb
-      >).filter((key) => key !== "id" && verb.value[key]);
-      return fieldNames[
-        Math.floor(Math.random() * fieldNames.length)
-      ] as keyof IrregularVerb;
-    }
+const dialogRef: Ref<HTMLDialogElement | null> = ref(null);
+const verb = computed<IrregularVerb>(
+  (): IrregularVerb => $store.getters[GetterTypes.selectRandomVerb]
+);
+const getAnswers = computed(
+  (): Array<Answer> => $store.getters[GetterTypes.getAnswers]
+);
+const countAnswers = computed(
+  (): number => $store.getters[GetterTypes.countAnswers]
+);
+const countTotal = computed(
+  (): number => $store.getters[GetterTypes.totalCount]
+);
+const countRemainingVerbs = computed(
+  () => $store.getters[GetterTypes.remainingCount]
+);
+function selectRandomFieldName(): keyof IrregularVerb {
+  const fieldNames = (
+    Object.keys(verb.value) as Array<keyof IrregularVerb>
+  ).filter((key) => key !== "id" && verb.value[key]);
+  return fieldNames[
+    Math.floor(Math.random() * fieldNames.length)
+  ] as keyof IrregularVerb;
+}
 
-    const containGoodAnswers = computed(
-      (): boolean => getAnswers.value.findIndex((a) => a.correct) !== -1
-    );
-    const containErrors = computed(
-      (): boolean => getAnswers.value.findIndex((a) => !a.correct) !== -1
-    );
-    let fieldName = ref(selectRandomFieldName());
-    const form = reactive<IrregularVerb>(
-      Object.assign(
-        {
-          id: verb.value.id,
-          infinitive: "",
-          past_simple: "",
-          past_simple_2: "",
-          past_participle: "",
-          translation: "",
-        },
-        { [fieldName.value]: verb.value[fieldName.value] }
-      )
-    );
-    const showErrors = ref(false);
+const containGoodAnswers = computed(
+  (): boolean => getAnswers.value.findIndex((a) => a.correct) !== -1
+);
+const containErrors = computed(
+  (): boolean => getAnswers.value.findIndex((a) => !a.correct) !== -1
+);
+let fieldName = ref(selectRandomFieldName());
+const form = reactive<IrregularVerb>(
+  Object.assign(
+    {
+      id: verb.value.id,
+      infinitive: "",
+      past_simple: "",
+      past_simple_2: "",
+      past_participle: "",
+      translation: "",
+    },
+    { [fieldName.value]: verb.value[fieldName.value] }
+  )
+);
+const showErrors = ref(false);
 
-    function invalidField(fieldName: keyof IrregularVerb) {
-      return showErrors.value && form[fieldName] !== verb.value[fieldName];
-    }
+function invalidField(fieldName: keyof IrregularVerb) {
+  return showErrors.value && form[fieldName] !== verb.value[fieldName];
+}
 
-    function checkAnswer(actualVerb: string, expectedVerb: string): boolean {
-      if (expectedVerb.includes(",")) {
-        const listAnswers = expectedVerb.split(",").map((v) => v.trim());
-        if (actualVerb.includes(",")) {
-          const listResponse = [
-            ...new Set(actualVerb.split(",").map((v) => v.trim())),
-          ];
-          return (
-            listResponse.length === listAnswers.length &&
-            listResponse.every((v) => listAnswers.includes(v))
-          );
-        }
-        return listAnswers.includes(actualVerb);
-      } else {
-        return expectedVerb === actualVerb;
-      }
-    }
-
-    function findFirstInputIdToEdit() {
-      const fieldNames = [
-        "infinitive",
-        "past_simple",
-        "past_simple_2",
-        "past_participle",
-        "translation",
+function checkAnswer(actualVerb: string, expectedVerb: string): boolean {
+  if (expectedVerb.includes(",")) {
+    const listAnswers = expectedVerb.split(",").map((v) => v.trim());
+    if (actualVerb.includes(",")) {
+      const listResponse = [
+        ...new Set(actualVerb.split(",").map((v) => v.trim())),
       ];
-      for (const field of fieldNames) {
-        if (field !== fieldName.value) {
-          return field;
-        }
-      }
-      return null;
-    }
-
-    function reset(): void {
-      Object.assign(
-        form,
-        {
-          id: verb.value.id,
-          infinitive: "",
-          past_simple: "",
-          past_simple_2: "",
-          past_participle: "",
-          translation: "",
-        },
-        { [fieldName.value]: verb.value[fieldName.value] }
+      return (
+        listResponse.length === listAnswers.length &&
+        listResponse.every((v) => listAnswers.includes(v))
       );
-
-      showErrors.value = false;
-      const inputId = findFirstInputIdToEdit();
-      inputId && document.getElementById(inputId)?.focus();
     }
+    return listAnswers.includes(actualVerb);
+  } else {
+    return expectedVerb === actualVerb;
+  }
+}
 
-    function onSubmit(): void {
-      showErrors.value =
-        (fieldName.value !== "infinitive" &&
-          !checkAnswer(form.infinitive, verb.value.infinitive)) ||
-        (fieldName.value !== "past_simple" &&
-          !checkAnswer(form.past_simple, verb.value.past_simple)) ||
-        (fieldName.value !== "past_simple_2" &&
-          !checkAnswer(form.past_simple_2, verb.value.past_simple_2)) ||
-        (fieldName.value !== "past_participle" &&
-          !checkAnswer(form.past_participle, verb.value.past_participle)) ||
-        (fieldName.value !== "translation" &&
-          !checkAnswer(form.translation, verb.value.translation));
-      $store.commit(MutationType.AddAnswer, {
-        ...form,
-        correct: !showErrors.value,
-      });
-      if (!showErrors.value) {
-        if (countRemainingVerbs.value > 0) {
-          fieldName.value = selectRandomFieldName();
-          reset();
-        } else {
-          if (dialogRef.value) {
-            dialogRef.value.showModal();
-          } else {
-            $router.push("/");
-          }
-        }
+function findFirstInputIdToEdit() {
+  const fieldNames = [
+    "infinitive",
+    "past_simple",
+    "past_simple_2",
+    "past_participle",
+    "translation",
+  ];
+  for (const field of fieldNames) {
+    if (field !== fieldName.value) {
+      return field;
+    }
+  }
+  return null;
+}
+
+function reset(): void {
+  Object.assign(
+    form,
+    {
+      id: verb.value.id,
+      infinitive: "",
+      past_simple: "",
+      past_simple_2: "",
+      past_participle: "",
+      translation: "",
+    },
+    { [fieldName.value]: verb.value[fieldName.value] }
+  );
+
+  showErrors.value = false;
+  const inputId = findFirstInputIdToEdit();
+  inputId && document.getElementById(inputId)?.focus();
+}
+
+function onSubmit(): void {
+  showErrors.value =
+    (fieldName.value !== "infinitive" &&
+      !checkAnswer(form.infinitive, verb.value.infinitive)) ||
+    (fieldName.value !== "past_simple" &&
+      !checkAnswer(form.past_simple, verb.value.past_simple)) ||
+    (fieldName.value !== "past_simple_2" &&
+      !checkAnswer(form.past_simple_2, verb.value.past_simple_2)) ||
+    (fieldName.value !== "past_participle" &&
+      !checkAnswer(form.past_participle, verb.value.past_participle)) ||
+    (fieldName.value !== "translation" &&
+      !checkAnswer(form.translation, verb.value.translation));
+  $store.commit(MutationType.AddAnswer, {
+    ...form,
+    correct: !showErrors.value,
+  });
+  if (!showErrors.value) {
+    if (countRemainingVerbs.value > 0) {
+      fieldName.value = selectRandomFieldName();
+      reset();
+    } else {
+      if (dialogRef.value) {
+        dialogRef.value.showModal();
+      } else {
+        $router.push("/");
       }
     }
+  }
+}
 
-    return {
-      verb,
-      form,
-      fieldName,
-      showErrors,
-      dialogRef,
+function onResumeErrors() {
+  $router.push({ name: "ResumeErrors" });
+}
 
-      countAnswers,
-      countTotal,
-      countRemainingVerbs,
-      getAnswers,
-      containGoodAnswers,
-      containErrors,
-
-      invalidField,
-      reset,
-      onSubmit,
-
-      onResumeErrors() {
-        $router.push({ name: "ResumeErrors" });
-      },
-
-      onReturnMenu() {
-        $store.commit(MutationType.ClearAnswer);
-        $router.push("/");
-      },
-    };
-  },
-});
+function onReturnMenu() {
+  $store.commit(MutationType.ClearAnswer);
+  $router.push("/");
+}
 </script>
 
 <style lang="scss" scoped>

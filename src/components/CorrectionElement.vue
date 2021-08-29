@@ -13,15 +13,13 @@
   </tr>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { IrregularVerb } from "@/store/state";
-import { defineComponent, PropType } from "vue";
+import { defineProps, PropType } from "vue";
 
-export default defineComponent({
-  props: {
-    badAnswer: { type: Object as PropType<IrregularVerb>, required: true },
-    expectedVerb: { type: Object as PropType<IrregularVerb>, required: true },
-  },
+defineProps({
+  badAnswer: { type: Object as PropType<IrregularVerb>, required: true },
+  expectedVerb: { type: Object as PropType<IrregularVerb>, required: true },
 });
 </script>
 
