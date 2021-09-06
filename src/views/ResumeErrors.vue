@@ -12,16 +12,16 @@
       </thead>
       <tbody>
         <CorrectionElement
-          v-for="([badAnswer, expectedVerb], index) in listCorrections"
+          v-for="([badAnswer, expectedAnswer], index) in corrections"
           :key="index"
           :badAnswer="badAnswer"
-          :expectedVerb="expectedVerb"
+          :expectedAnswer="expectedAnswer"
         />
       </tbody>
     </table>
   </div>
 
-  <div class="w-full flex justify-center">
+  <div class="w-full flex justify-center resume_button">
     <button class="nes-btn is-primary" @click="onReturnMenu">
       Menu principal
     </button>
@@ -29,23 +29,38 @@
 </template>
 
 <script lang="ts" setup>
+import { DeepReadonly, inject, Ref, ToRefs, UnwrapRef } from "vue";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
 
-import { GetterTypes } from "@/store/getters";
-import { IrregularVerb } from "@/store/state";
-import { MutationType } from "@/store/mutations";
+import { Answer, Exercise } from "@/models";
+import { UseExercise } from "@/hooks/useExercise";
 
 import CorrectionElement from "@/components/CorrectionElement.vue";
 
-const $store = useStore();
 const $router = useRouter();
+type AnswerInjected = {
+  answers: DeepReadonly<
+    UnwrapRef<Ref<ToRefs<Record<number, Answer<Exercise>>>>>
+  >;
+  type: "Irregular Verb" | "Vocabulary";
+};
+const exerciseDone = inject("exercise");
 
-const listCorrections: Array<[IrregularVerb, IrregularVerb]> =
-  $store.getters[GetterTypes.getCorrections];
+let corrections: Array<[Exercise, Exercise]> = [];
+if (exerciseDone === undefined) {
+  $router.push("/");
+} else {
+  const { getCorrections } = exerciseDone as UseExercise<Exercise>;
+  corrections = getCorrections.value;
+}
 
-function onReturnMenu() {
-  $store.commit(MutationType.ClearAnswer);
+function onReturnMenu(): void {
   $router.push("/");
 }
 </script>
+
+<style scoped>
+.resume_button {
+  margin-top: 1rem;
+}
+</style>

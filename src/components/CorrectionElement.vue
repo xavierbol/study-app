@@ -1,34 +1,29 @@
 <template>
-  <tr class="text-red">
-    <td>{{ badAnswer.infinitive }}</td>
-    <td>{{ badAnswer.past_simple }} - {{ badAnswer.past_simple_2 }}</td>
-    <td>{{ badAnswer.past_participle }}</td>
-    <td>{{ badAnswer.translation }}</td>
-  </tr>
-  <tr class="text-green">
-    <td>{{ expectedVerb.infinitive }}</td>
-    <td>{{ expectedVerb.past_simple }} - {{ expectedVerb.past_simple_2 }}</td>
-    <td>{{ expectedVerb.past_participle }}</td>
-    <td>{{ expectedVerb.translation }}</td>
-  </tr>
+  <CorrectionVocabulary
+    v-if="type === 'Vocabulary'"
+    :wrong-answer="badAnswer"
+    :expected-answer="expectedAnswer"
+  />
+  <CorrectionIrregularVerb
+    v-else
+    :wrong-answer="badAnswer"
+    :expected-answer="expectedAnswer"
+  />
 </template>
 
 <script lang="ts" setup>
-import { IrregularVerb } from "@/store/state";
 import { defineProps, PropType } from "vue";
+import { Exercise, IrregularVerb, isIrregularVerb, Vocabulary } from "@/models";
+import CorrectionVocabulary from "./CorrectionVocabulary.vue";
+import CorrectionIrregularVerb from "./CorrectionIrregularVerb.vue";
 
-defineProps({
-  badAnswer: { type: Object as PropType<IrregularVerb>, required: true },
-  expectedVerb: { type: Object as PropType<IrregularVerb>, required: true },
+const props = defineProps({
+  badAnswer: { type: Object as PropType<Exercise>, required: true },
+  expectedAnswer: { type: Object as PropType<Exercise>, required: true },
 });
+
+const type: "Irregular Verb" | "Vocabulary" =
+  isIrregularVerb(props.badAnswer) && isIrregularVerb(props.expectedAnswer)
+    ? "Irregular Verb"
+    : "Vocabulary";
 </script>
-
-<style lang="scss" scoped>
-.text-green {
-  color: green;
-}
-
-.text-red {
-  color: red;
-}
-</style>

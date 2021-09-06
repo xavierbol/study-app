@@ -1,39 +1,44 @@
-import { MutationTree } from "vuex";
-import { Answer, IrregularVerb, StateInterface } from "./state";
+import { Mutation, MutationTree } from "vuex";
+import { State } from "./state";
+import { Answer, IrregularVerb, Vocabulary } from "../models";
 
 export enum MutationType {
-  CreateIrregularVerb = "CREATE_IRREGULAR_VERB",
-  SetIrregularVerbs = "SET_IRREGULAR_VERBS",
-  RemoveIrregularVerb = "REMOVE_IRREGULAR_VERB",
-  CompleteIrregularVerb = "COMPLET_IRREGULAR_VERB",
-  AddAnswer = "ADD_ANSWER",
-  ClearAnswer = "CLEAR_ANSWERS",
-  SetLoading = "SET_LOADING",
-  ErrorIrregularVerb = "ERROR_IRREGULAR_VERB",
+  createIrregularVerb = "CREATE_IRREGULAR_VERB",
+  setIrregularVerbs = "SET_IRREGULAR_VERBS",
+  removeIrregularVerb = "REMOVE_IRREGULAR_VERB",
+  updateIrregularVerb = "UPDATE_IRREGULAR_VERB",
+  setLoading = "SET_LOADING",
+  setError = "SET_ERROR",
 }
 
-const mutations: MutationTree<StateInterface> = {
-  [MutationType.CreateIrregularVerb](
-    state: StateInterface,
-    verb: IrregularVerb
-  ) {
+export type Mutations<S = State> = {
+  [MutationType.createIrregularVerb](state: S, payload: IrregularVerb): void;
+  [MutationType.setIrregularVerbs](state: S, payload: IrregularVerb[]): void;
+  [MutationType.removeIrregularVerb](state: S, payload: number): void;
+  [MutationType.updateIrregularVerb](
+    state: S,
+    payload: Partial<IrregularVerb> & { id: number }
+  ): void;
+  [MutationType.setLoading](state: S, payload: boolean): void;
+  [MutationType.setError](state: S, payload: string): void;
+};
+
+const mutations: MutationTree<State> & Mutations = {
+  [MutationType.createIrregularVerb](state: State, verb: IrregularVerb) {
     state.verbs.push(verb);
     state.error = undefined;
   },
-  [MutationType.SetIrregularVerbs](
-    state: StateInterface,
-    verbs: IrregularVerb[]
-  ) {
+  [MutationType.setIrregularVerbs](state: State, verbs: IrregularVerb[]) {
     state.verbs = verbs;
     state.error = undefined;
   },
-  [MutationType.RemoveIrregularVerb](state: StateInterface, verbId: number) {
+  [MutationType.removeIrregularVerb](state: State, verbId: number) {
     state.verbs = state.verbs.filter((verb) => verb.id !== verbId);
     state.error = undefined;
   },
-  [MutationType.CompleteIrregularVerb](
-    state: StateInterface,
-    verb: IrregularVerb
+  [MutationType.updateIrregularVerb](
+    state: State,
+    verb: Partial<IrregularVerb> & { id: number }
   ) {
     const index = state.verbs.findIndex((v) => v.id === verb.id);
     state.verbs[index] = {
@@ -42,23 +47,10 @@ const mutations: MutationTree<StateInterface> = {
     };
     state.error = undefined;
   },
-  [MutationType.AddAnswer](state: StateInterface, answer: Answer) {
-    if (answer.correct) {
-      state.exerciceDoneIds.push(answer.id);
-    }
-    if (state.answers.hasOwnProperty(answer.id)) {
-      return;
-    }
-    state.answers[answer.id] = answer;
-  },
-  [MutationType.ClearAnswer](state: StateInterface) {
-    state.answers = {};
-    state.error = undefined;
-  },
-  [MutationType.SetLoading](state: StateInterface, loading: boolean) {
+  [MutationType.setLoading](state: State, loading: boolean) {
     state.loading = loading;
   },
-  [MutationType.ErrorIrregularVerb](state: StateInterface, error: string) {
+  [MutationType.setError](state: State, error: string) {
     state.error = error;
   },
 };

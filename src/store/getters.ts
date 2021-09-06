@@ -1,57 +1,18 @@
+import { IrregularVerb } from "@/models";
 import { GetterTree } from "vuex";
-import { StateInterface, IrregularVerb } from "./state";
+import { State } from "./state";
 
-export enum GetterTypes {
-  totalCount = "COUNT_TOTAL",
-  countAnswers = "COUNT_NUMBER_OF_ANSWERS",
-  remainingCount = "COUNT_REMAINING_VERBS",
-  remainingVerbs = "GET_REMAINING_VERBS",
-  selectIrregularVerbById = "SELECT_IRREGULAR_VERB_BY_ID",
-  selectRandomVerb = "SELECT_RANDOM_VERB",
-  getAnswers = "GET_ANSWERS",
-  getCorrections = "GET_CORRECTIONS",
-}
+export type Getters = {
+  totalCount: (state: State) => number;
+  getVerb: (state: State) => (id: number) => IrregularVerb | undefined;
+};
 
-const getters: GetterTree<StateInterface, StateInterface> = {
-  [GetterTypes.totalCount](state) {
+const getters: GetterTree<State, State> & Getters = {
+  totalCount(state) {
     return state.verbs.length;
   },
-  [GetterTypes.countAnswers](state) {
-    return Object.keys(state.answers).length;
-  },
-  [GetterTypes.remainingCount](state, getters) {
-    return getters[GetterTypes.totalCount] - state.exerciceDoneIds.length;
-  },
-  [GetterTypes.remainingVerbs](state, getters) {
-    if (state.exerciceDoneIds.length === 0) return state.verbs;
-    return state.verbs.filter((v) => !state.exerciceDoneIds.includes(v.id));
-  },
-  [GetterTypes.selectIrregularVerbById](state) {
+  getVerb(state) {
     return (id: number) => state.verbs.find((verb) => verb.id === id);
-  },
-  [GetterTypes.selectRandomVerb](state, getters) {
-    const remainingVerbsToDo = getters[GetterTypes.remainingCount];
-    if (remainingVerbsToDo === 0) return null;
-    const remainingVerbs = getters[GetterTypes.remainingVerbs];
-    if (remainingVerbsToDo === 1) return remainingVerbs[0];
-    // return a number in this interval: [0; totalCount[
-    return remainingVerbs[Math.floor(Math.random() * remainingVerbsToDo)];
-  },
-  [GetterTypes.getAnswers](state) {
-    return Object.values(state.answers);
-  },
-  [GetterTypes.getCorrections](state, getters) {
-    const verbs = state.verbs;
-    const answers = getters[GetterTypes.getAnswers];
-    const corrections: Array<[IrregularVerb, IrregularVerb]> = [];
-    answers.forEach((answer: IrregularVerb & { correct: boolean }) => {
-      const verb = answer as IrregularVerb;
-      if (!answer.correct) {
-        const expectedVerb = verbs.find((v) => v.id === answer.id);
-        expectedVerb && corrections.push([verb, expectedVerb]);
-      }
-    });
-    return corrections;
   },
 };
 

@@ -3,3 +3,10 @@
     <router-view></router-view>
   </section>
 </template>
+
+<script lang="ts" setup>
+import { provide } from "vue";
+import { useExercise } from "@/hooks/useExercise";
+
+provide("exercise", useExercise());
+</script>

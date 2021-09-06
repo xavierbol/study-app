@@ -1,13 +1,13 @@
 <template>
   <h1 class="title">Verbes irréguliers</h1>
-  <form @submit.prevent="onSubmit" autocomplete="off">
+  <form autocomplete="off" @submit.prevent="onSubmit">
     <div class="row">
       <div class="nes-field w-full">
         <label for="infinitive">Infinitif</label>
         <input
-          v-model.trim="form.infinitive"
+          v-model.trim="irregularVerbForm.infinitive"
           type="text"
-          id="infinitive"
+          name="infinitive"
           :class="`nes-input ${
             showErrors && fieldName !== 'infinitive'
               ? invalidField('infinitive')
@@ -27,9 +27,9 @@
       <div class="nes-field col-6 mr-2">
         <label for="past_simple">Imparfait (singulier)</label>
         <input
-          v-model.trim="form.past_simple"
+          v-model.trim="irregularVerbForm.past_simple"
           type="text"
-          id="past_simple"
+          name="past_simple"
           :class="`nes-input ${
             showErrors && fieldName !== 'past_simple'
               ? invalidField('past_simple')
@@ -47,9 +47,9 @@
       <div class="nes-field col-6">
         <label for="past_simple_2">Imparfait (pluriel)</label>
         <input
-          v-model.trim="form.past_simple_2"
+          v-model.trim="irregularVerbForm.past_simple_2"
           type="text"
-          id="past_simple_2"
+          name="past_simple_2"
           :class="`nes-input ${
             showErrors && fieldName !== 'past_simple_2'
               ? invalidField('past_simple_2')
@@ -69,9 +69,9 @@
       <div class="nes-field w-full">
         <label for="past_participle">Participe passé</label>
         <input
-          v-model.trim="form.past_participle"
+          v-model.trim="irregularVerbForm.past_participle"
           type="text"
-          id="past_participle"
+          name="past_participle"
           :class="`nes-input ${
             showErrors && fieldName !== 'past_participle'
               ? invalidField('past_participle')
@@ -91,9 +91,9 @@
       <div class="nes-field w-full">
         <label for="translation">Traduction</label>
         <input
-          v-model.trim="form.translation"
+          v-model.trim="irregularVerbForm.translation"
           type="text"
-          id="translation"
+          name="translation"
           :class="`nes-input ${
             showErrors && fieldName !== 'translation'
               ? invalidField('translation')
@@ -115,26 +115,26 @@
     </div>
   </form>
   <div class="flex justify-between">
-    <div v-if="countAnswers <= 10">
+    <div v-if="totalExercises - remainingExercises <= 10">
+      <i v-for="i in state.goodAnswerCount" class="nes-icon coin" :key="i"></i>
       <i
-        v-for="(answer, index) in getAnswers"
-        :key="index"
-        :class="`nes-icon ${answer.correct ? 'coin' : 'close'}`"
+        v-for="i in state.wrongAnswerCount"
+        class="nes-icon close"
+        :key="i"
       ></i>
     </div>
     <div v-else>
-      <span v-if="containGoodAnswers" class="nes-text">
+      <span v-if="state.goodAnswerCount > 0" class="nes-text">
         <i class="nes-icon coin"></i> x
-        {{ getAnswers.filter((a) => a.correct).length }}
+        {{ state.goodAnswerCount }}
       </span>
-      <span v-if="containErrors" class="nes-text">
+      <span v-if="state.wrongAnswerCount > 0" class="nes-text">
         <i class="nes-icon close"></i> x
-        {{ getAnswers.filter((a) => !a.correct).length }}
+        {{ state.wrongAnswerCount }}
       </span>
     </div>
     <span class="nes-text">
-      {{ countRemainingVerbs ? countAnswers + 1 : countTotal }} /
-      {{ countTotal }}
+      {{ `${totalExercises - remainingExercises + 1} / ${totalExercises}` }}
     </span>
   </div>
 
@@ -149,11 +149,15 @@
       tous les verbes irréguliers <br />
       de cet exercice.
     </p>
-    <p class="text-center" v-if="containErrors">
+    <p class="text-center" v-if="state.wrongAnswerCount > 0">
       Voulez-vous réviser vos erreurs ?
     </p>
     <menu class="dialog-menu flex justify-around">
-      <Button v-if="containErrors" color="primary" @click="onResumeErrors">
+      <Button
+        v-if="state.wrongAnswerCount > 0"
+        color="primary"
+        @click="onResumeErrors"
+      >
         Oui
       </Button>
       <Button color="secondary" @click="onReturnMenu">Non</Button>
@@ -162,50 +166,35 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, Ref, ref } from "vue";
-import Button from "@/components/Button.vue";
-import { Answer, IrregularVerb } from "@/store/state";
-import { useStore } from "vuex";
-import { GetterTypes } from "@/store/getters";
+import { ComputedRef, reactive, Ref, ref, inject } from "vue";
 import { useRouter } from "vue-router";
-import { MutationType } from "@/store/mutations";
+
+import { useStore } from "@/store";
+import { IrregularVerb } from "@/models";
+import { UseExercise } from "@/hooks/useExercise";
+
+import Button from "@/components/Button.vue";
 
 const $store = useStore();
 const $router = useRouter();
+const {
+  state,
+  setData,
+  addAnswer,
+  getExercise,
+  remainingExercises,
+  totalExercises,
+  selectRandomFieldName,
+  checkAnswer,
+  findFirstFieldToEdit,
+} = inject("exercise") as UseExercise<IrregularVerb>;
+setData($store.state.verbs);
 
 const dialogRef: Ref<HTMLDialogElement | null> = ref(null);
-const verb = computed<IrregularVerb>(
-  (): IrregularVerb => $store.getters[GetterTypes.selectRandomVerb]
-);
-const getAnswers = computed(
-  (): Array<Answer> => $store.getters[GetterTypes.getAnswers]
-);
-const countAnswers = computed(
-  (): number => $store.getters[GetterTypes.countAnswers]
-);
-const countTotal = computed(
-  (): number => $store.getters[GetterTypes.totalCount]
-);
-const countRemainingVerbs = computed(
-  () => $store.getters[GetterTypes.remainingCount]
-);
-function selectRandomFieldName(): keyof IrregularVerb {
-  const fieldNames = (
-    Object.keys(verb.value) as Array<keyof IrregularVerb>
-  ).filter((key) => key !== "id" && verb.value[key]);
-  return fieldNames[
-    Math.floor(Math.random() * fieldNames.length)
-  ] as keyof IrregularVerb;
-}
+const verb = getExercise as ComputedRef<IrregularVerb>;
 
-const containGoodAnswers = computed(
-  (): boolean => getAnswers.value.findIndex((a) => a.correct) !== -1
-);
-const containErrors = computed(
-  (): boolean => getAnswers.value.findIndex((a) => !a.correct) !== -1
-);
-let fieldName = ref(selectRandomFieldName());
-const form = reactive<IrregularVerb>(
+let fieldName = ref(selectRandomFieldName(verb.value));
+const irregularVerbForm = reactive<IrregularVerb>(
   Object.assign(
     {
       id: verb.value.id,
@@ -221,46 +210,14 @@ const form = reactive<IrregularVerb>(
 const showErrors = ref(false);
 
 function invalidField(fieldName: keyof IrregularVerb) {
-  return showErrors.value && form[fieldName] !== verb.value[fieldName];
-}
-
-function checkAnswer(actualVerb: string, expectedVerb: string): boolean {
-  if (expectedVerb.includes(",")) {
-    const listAnswers = expectedVerb.split(",").map((v) => v.trim());
-    if (actualVerb.includes(",")) {
-      const listResponse = [
-        ...new Set(actualVerb.split(",").map((v) => v.trim())),
-      ];
-      return (
-        listResponse.length === listAnswers.length &&
-        listResponse.every((v) => listAnswers.includes(v))
-      );
-    }
-    return listAnswers.includes(actualVerb);
-  } else {
-    return expectedVerb === actualVerb;
-  }
-}
-
-function findFirstInputIdToEdit() {
-  const fieldNames = [
-    "infinitive",
-    "past_simple",
-    "past_simple_2",
-    "past_participle",
-    "translation",
-  ];
-  for (const field of fieldNames) {
-    if (field !== fieldName.value) {
-      return field;
-    }
-  }
-  return null;
+  return (
+    showErrors.value && irregularVerbForm[fieldName] !== verb.value[fieldName]
+  );
 }
 
 function reset(): void {
   Object.assign(
-    form,
+    irregularVerbForm,
     {
       id: verb.value.id,
       infinitive: "",
@@ -273,29 +230,43 @@ function reset(): void {
   );
 
   showErrors.value = false;
-  const inputId = findFirstInputIdToEdit();
-  inputId && document.getElementById(inputId)?.focus();
+  const inputName = findFirstFieldToEdit(fieldName.value, [
+    "infinitive",
+    "past_simple",
+    "past_simple_2",
+    "past_participle",
+    "translation",
+  ]);
+  inputName &&
+    (
+      document.querySelector(
+        `input[@name='${inputName}']`
+      ) as HTMLInputElement | null
+    )?.focus();
 }
 
 function onSubmit(): void {
   showErrors.value =
     (fieldName.value !== "infinitive" &&
-      !checkAnswer(form.infinitive, verb.value.infinitive)) ||
+      !checkAnswer(irregularVerbForm.infinitive, verb.value.infinitive)) ||
     (fieldName.value !== "past_simple" &&
-      !checkAnswer(form.past_simple, verb.value.past_simple)) ||
+      !checkAnswer(irregularVerbForm.past_simple, verb.value.past_simple)) ||
     (fieldName.value !== "past_simple_2" &&
-      !checkAnswer(form.past_simple_2, verb.value.past_simple_2)) ||
+      !checkAnswer(
+        irregularVerbForm.past_simple_2,
+        verb.value.past_simple_2
+      )) ||
     (fieldName.value !== "past_participle" &&
-      !checkAnswer(form.past_participle, verb.value.past_participle)) ||
+      !checkAnswer(
+        irregularVerbForm.past_participle,
+        verb.value.past_participle
+      )) ||
     (fieldName.value !== "translation" &&
-      !checkAnswer(form.translation, verb.value.translation));
-  $store.commit(MutationType.AddAnswer, {
-    ...form,
-    correct: !showErrors.value,
-  });
+      !checkAnswer(irregularVerbForm.translation, verb.value.translation));
+  addAnswer({ ...irregularVerbForm, correct: !showErrors.value });
   if (!showErrors.value) {
-    if (countRemainingVerbs.value > 0) {
-      fieldName.value = selectRandomFieldName();
+    if (remainingExercises.value > 0) {
+      fieldName.value = selectRandomFieldName(verb.value);
       reset();
     } else {
       if (dialogRef.value) {
@@ -308,11 +279,12 @@ function onSubmit(): void {
 }
 
 function onResumeErrors() {
-  $router.push({ name: "ResumeErrors" });
+  $router.push({
+    name: "ResumeErrors",
+  });
 }
 
 function onReturnMenu() {
-  $store.commit(MutationType.ClearAnswer);
   $router.push("/");
 }
 </script>
