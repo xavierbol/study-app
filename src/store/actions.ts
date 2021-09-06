@@ -1,6 +1,7 @@
-import { ActionTree } from "vuex";
-import { MutationType } from "./mutations";
-import { IrregularVerb, StateInterface } from "./state";
+import { ActionContext, ActionTree } from "vuex";
+import { Mutations, MutationType } from "./mutations";
+import { State } from "./state";
+import { IrregularVerb } from "../models";
 
 const SERVER_URL = "http://localhost:3333/api";
 const IRREGULAR_VERB_URL = `${SERVER_URL}/irregular_verbs`;
@@ -13,13 +14,32 @@ const headers = {
 
 export enum ActionTypes {
   GetVerbs = "GET_VERBS",
-  CreateVerb = "CREATE_VERB",
   DeleteVerb = "DELETE_VERB",
+  CreateVerb = "CREATE_VERB",
 }
 
-const actions: ActionTree<StateInterface, StateInterface> = {
+type AugmentedActionContext = {
+  commit<K extends keyof Mutations>(
+    key: K,
+    payload: Parameters<Mutations[K]>[1]
+  ): ReturnType<Mutations[K]>;
+} & Omit<ActionContext<State, State>, "commit">;
+
+export interface Actions {
+  [ActionTypes.GetVerbs]({ commit }: AugmentedActionContext): Promise<void>;
+  [ActionTypes.CreateVerb](
+    { commit }: AugmentedActionContext,
+    payload: IrregularVerb
+  ): Promise<void>;
+  [ActionTypes.DeleteVerb](
+    { commit }: AugmentedActionContext,
+    payload: number
+  ): Promise<void>;
+}
+
+const actions: ActionTree<State, State> & Actions = {
   async [ActionTypes.GetVerbs]({ commit }) {
-    commit(MutationType.SetLoading, true);
+    commit(MutationType.setLoading, true);
     try {
       const result: Response = await fetch(IRREGULAR_VERB_URL, {
         method: "GET",
@@ -28,19 +48,19 @@ const actions: ActionTree<StateInterface, StateInterface> = {
 
       if (result.ok) {
         const json = (await result.json()) as Array<IrregularVerb>;
-        commit(MutationType.SetIrregularVerbs, json);
+        commit(MutationType.setIrregularVerbs, json);
       } else {
-        commit(MutationType.ErrorIrregularVerb, await result.text());
+        commit(MutationType.setError, await result.text());
       }
     } catch (error) {
       console.error(error);
-      commit(MutationType.ErrorIrregularVerb, error);
+      commit(MutationType.setError, error);
     } finally {
-      commit(MutationType.SetLoading, false);
+      commit(MutationType.setLoading, false);
     }
   },
   async [ActionTypes.CreateVerb]({ commit }, verb: IrregularVerb) {
-    commit(MutationType.SetLoading, true);
+    commit(MutationType.setLoading, true);
     try {
       const result: Response = await fetch(IRREGULAR_VERB_URL, {
         method: "POST",
@@ -50,21 +70,21 @@ const actions: ActionTree<StateInterface, StateInterface> = {
 
       if (result.ok) {
         const newVerb = (await result.json()) as IrregularVerb;
-        commit(MutationType.CreateIrregularVerb, newVerb);
+        commit(MutationType.createIrregularVerb, newVerb);
       } else {
         const error = await result.text();
         console.error(error);
-        commit(MutationType.ErrorIrregularVerb, error);
+        commit(MutationType.setError, error);
       }
     } catch (error) {
       console.error(error);
-      commit(MutationType.ErrorIrregularVerb, error);
+      commit(MutationType.setError, error);
     } finally {
-      commit(MutationType.SetLoading, false);
+      commit(MutationType.setLoading, false);
     }
   },
   async [ActionTypes.DeleteVerb]({ commit }, verbId: number) {
-    commit(MutationType.SetLoading, true);
+    commit(MutationType.setLoading, true);
     try {
       const result: Response = await fetch(`${IRREGULAR_VERB_URL}/${verbId}`, {
         method: "DELETE",
@@ -72,17 +92,17 @@ const actions: ActionTree<StateInterface, StateInterface> = {
       });
 
       if (result.ok && result.status === 204) {
-        commit(MutationType.RemoveIrregularVerb, verbId);
+        commit(MutationType.removeIrregularVerb, verbId);
       } else {
-        const error = result.text();
+        const error = await result.text();
         console.error(error);
-        commit(MutationType.ErrorIrregularVerb, error);
+        commit(MutationType.setError, error);
       }
     } catch (error) {
       console.error(error);
-      commit(MutationType.ErrorIrregularVerb, error);
+      commit(MutationType.setError, error);
     } finally {
-      commit(MutationType.SetLoading, false);
+      commit(MutationType.setLoading, false);
     }
   },
 };
