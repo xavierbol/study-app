@@ -1,5 +1,3 @@
 <template>
-  <section class="nes-container with-title">
-    <router-view></router-view>
-  </section>
+  <router-view />
 </template>

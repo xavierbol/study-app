@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
-import store from "../store";
-import { GetterTypes } from "@/store/getters";
-import { ActionTypes } from "@/store/actions";
+import { useStore } from "@/store";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -12,27 +10,46 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/:lang",
-    name: "Language",
-    beforeEnter: async () => {
-      if (store.getters[GetterTypes.totalCount] === 0) {
-        await store.dispatch(ActionTypes.GetVerbs);
-      }
-    },
     component: () =>
       import(/* webpackChunkName: "home" */ "../views/LangView.vue"),
     children: [
       {
-        path: "verbe-irreguliers",
+        path: "",
+        name: "ExerciseMenu",
         component: () =>
-          import(/* webpackChunkName: "lang" */ "../views/IrregularVerbs.vue"),
+          import(/* webpackChunkName: "home" */ "../views/ExerciseMenu.vue"),
       },
       {
-        name: "ResumeErrors",
-        path: "revision_erreurs",
+        path: "exercices",
+        name: "Exercises",
         component: () =>
-          import(
-            /* webpackChunkName: "resume_errors" */ "../views/ResumeErrors.vue"
-          ),
+          import(/* webpackChunkName: 'lang' */ "../views/Exercises.vue"),
+        children: [
+          {
+            path: "verbe-irreguliers",
+            name: "IrregularVerbs",
+            component: () =>
+              import(
+                /* webpackChunkName: "exercises" */ "../views/IrregularVerbs.vue"
+              ),
+          },
+          {
+            path: "vocabulaires",
+            name: "Vocabularies",
+            component: () =>
+              import(
+                /* webpackChunkName: "exercises" */ "../views/IrregularVerbs.vue"
+              ),
+          },
+          {
+            path: "revision_erreurs",
+            name: "ResumeErrors",
+            component: () =>
+              import(
+                /* webpackChunkName: "resume_errors" */ "../views/ResumeErrors.vue"
+              ),
+          },
+        ],
       },
     ],
   },
