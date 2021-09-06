@@ -45,6 +45,10 @@
   justify-content: center;
 }
 
+.justify-evenly {
+  justify-content: space-evenly;
+}
+
 .justify-end {
   justify-content: flex-end;
 }
