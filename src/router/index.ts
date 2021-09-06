@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 import { useStore } from "@/store";
+import { ToastActionTypes } from "@/store/toast/actions";
+import { ActionTypes } from "@/store/actions";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -32,6 +34,30 @@ const routes: Array<RouteRecordRaw> = [
               import(
                 /* webpackChunkName: "exercises" */ "../views/IrregularVerbs.vue"
               ),
+            beforeEnter: async () => {
+              const $store = useStore();
+              let fetchData = false;
+              try {
+                if ($store.getters.totalCount === 0) {
+                  fetchData = true;
+                  await $store.dispatch(ActionTypes.GetVerbs);
+                }
+              } catch (err) {
+                console.error(err);
+                $store.dispatch(
+                  ToastActionTypes.show,
+                  "Erreur, le serveur est inaccessible,\nil nous est impossible d'afficher les exercices."
+                );
+                return false;
+              }
+              if (fetchData && $store.getters.totalCount === 0) {
+                $store.dispatch(
+                  ToastActionTypes.show,
+                  "Aucune donnée n'a été récupérée pour lancer l'exercice, veuillez d'avoir ajouté des verbes/mots avant de lancer un exercice."
+                );
+                return false;
+              }
+            },
           },
           {
             path: "vocabulaires",
