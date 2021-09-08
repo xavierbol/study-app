@@ -3,6 +3,8 @@ import Home from "../views/Home.vue";
 import { useStore } from "@/store";
 import { ToastActionTypes } from "@/store/toast/actions";
 import { ActionTypes } from "@/store/actions";
+import { VocabulariesGetterTypes } from "@/store/vocabulary/getters";
+import { VocabularyActionTypes } from "@/store/vocabulary/actions";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -66,6 +68,33 @@ const routes: Array<RouteRecordRaw> = [
               import(
                 /* webpackChunkName: "exercises" */ "../views/IrregularVerbs.vue"
               ),
+            beforeEnter: async () => {
+              const $store = useStore();
+              let fetchData = false;
+              try {
+                if ($store.getters[VocabulariesGetterTypes.totalCount] === 0) {
+                  fetchData = true;
+                  await $store.dispatch(VocabularyActionTypes.getVocabularies);
+                }
+              } catch (err) {
+                console.error(err);
+                $store.dispatch(
+                  ToastActionTypes.show,
+                  "Erreur, le serveur est inaccessible, \nil nous est impossible d'afficher les exercices."
+                );
+                return false;
+              }
+              if (
+                fetchData &&
+                $store.getters[VocabulariesGetterTypes.totalCount] === 0
+              ) {
+                $store.dispatch(
+                  ToastActionTypes.show,
+                  "Aucun mot de vocabulaire n'a été récupérée pour lancer l'exercice, \nveuillez d'abord ajouté des mots de vocabulaires avant de lancer un exercice."
+                );
+                return false;
+              }
+            },
           },
           {
             path: "revision_erreurs",

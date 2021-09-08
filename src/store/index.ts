@@ -13,6 +13,11 @@ import { ToastState } from "./toast/state";
 import { ToastMutations } from "./toast/mutations";
 import { toastModule } from "./toast";
 import { ToastActions } from "./toast/actions";
+import { VocabularyMutations } from "./vocabulary/mutations";
+import { VocabularyActions } from "./vocabulary/actions";
+import { VocabularyState } from "./vocabulary/state";
+import { vocabularyModule } from "./vocabulary";
+import { VocabularyGetters } from "./vocabulary/getters";
 
 export const store = createStore({
   state,
@@ -21,31 +26,36 @@ export const store = createStore({
   getters,
   modules: {
     toast: toastModule,
+    vocabulary: vocabularyModule,
   },
   plugins: process.env.NODE_ENV === "development" ? [createLogger()] : [],
 });
 
 export type Store = Omit<
-  VuexStore<State & { toast: ToastState }>,
+  VuexStore<State & { toast: ToastState; vocabulary: VocabularyState }>,
   "getters" | "commit" | "dispatch"
 > & {
   commit<
-    K extends keyof (Mutations & ToastMutations),
-    P extends Parameters<(Mutations & ToastMutations)[K]>[1]
+    K extends keyof (Mutations & ToastMutations & VocabularyMutations),
+    P extends Parameters<
+      (Mutations & ToastMutations & VocabularyMutations)[K]
+    >[1]
   >(
     key: K,
     payload: P,
     options?: CommitOptions
-  ): ReturnType<(Mutations & ToastMutations)[K]>;
+  ): ReturnType<(Mutations & ToastMutations & VocabularyMutations)[K]>;
 } & {
-  dispatch<K extends keyof (Actions & ToastActions)>(
+  dispatch<K extends keyof (Actions & ToastActions & VocabularyActions)>(
     key: K,
-    payload?: Parameters<(Actions & ToastActions)[K]>[1],
+    payload?: Parameters<(Actions & ToastActions & VocabularyActions)[K]>[1],
     options?: DispatchOptions
-  ): ReturnType<(Actions & ToastActions)[K]>;
+  ): ReturnType<(Actions & ToastActions & VocabularyActions)[K]>;
 } & {
   getters: {
-    [K in keyof Getters]: ReturnType<Getters[K]>;
+    [K in keyof (Getters & VocabularyGetters)]: ReturnType<
+      (Getters & VocabularyGetters)[K]
+    >;
   };
 };
 
