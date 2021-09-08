@@ -2,15 +2,9 @@ import { ActionContext, ActionTree } from "vuex";
 import { Mutations, MutationType } from "./mutations";
 import { State } from "./state";
 import { IrregularVerb } from "../models";
+import { headers, getRoute } from "@/utils";
 
-const SERVER_URL = "http://localhost:3333/api";
-const IRREGULAR_VERB_URL = `${SERVER_URL}/irregular_verbs`;
-
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET,POST,DELETE,PUT",
-};
+const IRREGULAR_VERB_URL = getRoute("/irregular_verbs");
 
 export enum ActionTypes {
   GetVerbs = "GET_VERBS",
