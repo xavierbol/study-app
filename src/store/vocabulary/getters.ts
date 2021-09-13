@@ -26,8 +26,8 @@ export enum VocabulariesGetterTypes {
 }
 
 export type VocabularyGetters = {
-  [VocabulariesGetterTypes.totalCount](state: VocabularyState) => number;
+  [VocabulariesGetterTypes.totalCount]: (state: VocabularyState) => number;
   [VocabulariesGetterTypes.getVocabulary]: (
     state: VocabularyState
   ) => (id: number) => Vocabulary | undefined;
-}
+};
