@@ -114,6 +114,7 @@ import { useStore } from "@/store";
 import { UseExercise } from "@/hooks/useExercise";
 import { Vocabulary } from "@/models";
 import { ComputedRef, inject, reactive, ref, Ref } from "@vue/runtime-core";
+import { Language, useLang } from "@/hooks/useLang";
 
 const $route = useRoute();
 const $store = useStore();
@@ -154,7 +155,7 @@ function invalidField(fieldName: keyof Vocabulary) {
   );
 }
 
-const language = $route.params.lang === "nl" ? "néerlandais" : "anglais";
+const language = useLang($route.params.lang as Language);
 
 function onReset(): void {
   Object.assign(
