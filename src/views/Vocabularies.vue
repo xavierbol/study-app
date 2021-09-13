@@ -214,12 +214,6 @@ function onReturnMenu() {
   margin-top: 3rem;
 }
 
-.row {
-  display: flex;
-  width: 100%;
-  margin-bottom: 3rem;
-}
-
 .col-6 {
   width: 50%;
 }

@@ -52,4 +52,10 @@
 .justify-end {
   justify-content: flex-end;
 }
+
+.row {
+  display: flex;
+  width: 100%;
+  margin-bottom: 3rem;
+}
 </style>
