@@ -240,7 +240,7 @@ function reset(): void {
   inputName &&
     (
       document.querySelector(
-        `input[@name='${inputName}']`
+        `input[name='${inputName}']`
       ) as HTMLInputElement | null
     )?.focus();
 }
