@@ -70,7 +70,13 @@
       </span>
     </div>
     <span class="nes-text">
-      {{ `${totalExercises - remainingExercises + 1} / ${totalExercises}` }}
+      {{
+        `${
+          remainingExercises >= totalExercises
+            ? totalExercises - remainingExercises
+            : totalExercises - remainingExercises + 1
+        } / ${totalExercises}`
+      }}
     </span>
   </div>
 
@@ -166,7 +172,7 @@ function onReset(): void {
   inputName &&
     (
       document.querySelector(
-        `input[@name='${inputName}']`
+        `input[name='${inputName}']`
       ) as HTMLInputElement | null
     )?.focus();
 }
