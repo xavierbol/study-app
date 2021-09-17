@@ -3,9 +3,10 @@
     <Button :to="`${prefix}/exercices/verbe-irreguliers`">
       Verbes irréguliers en {{ language }}
     </Button>
-    <Button :to="`${prefix}/exercices/vocabulaires`" disabled>
+    <Button :to="`${prefix}/exercices/vocabulaires`">
       Vocabulaires en {{ language }}
     </Button>
+    <Button :to="`${prefix}/vocabularies`"> Liste de vocabulaires </Button>
   </MainContainer>
   <Toast
     :show="toast.show"

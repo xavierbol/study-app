@@ -6,6 +6,37 @@ import { ActionTypes } from "@/store/actions";
 import { VocabulariesGetterTypes } from "@/store/vocabulary/getters";
 import { VocabularyActionTypes } from "@/store/vocabulary/actions";
 
+async function fetchData(
+  action: ActionTypes | VocabularyActionTypes,
+  getterName: "totalCount" | "vocabulary/totalCount",
+  fetch = false,
+  requireData = false
+): Promise<boolean | undefined> {
+  const $store = useStore();
+  let fetchData = false;
+  try {
+    if (fetch || $store.getters[getterName] === 0) {
+      fetchData = true;
+      await $store.dispatch(action);
+    }
+  } catch (err) {
+    console.error(err);
+    $store.dispatch(
+      ToastActionTypes.show,
+      "Erreur, le serveur est inaccessible,\nil nous est impossible d'afficher les exercices."
+    );
+    return false;
+  }
+  if (requireData && fetchData && $store.getters[getterName] === 0) {
+    $store.dispatch(
+      ToastActionTypes.show,
+      "Aucune donnée n'a été récupérée pour lancer l'exercice, veuillez d'avoir ajouté des verbes/mots avant de lancer un exercice."
+    );
+    return false;
+  }
+  return true;
+}
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -24,6 +55,48 @@ const routes: Array<RouteRecordRaw> = [
           import(/* webpackChunkName: "home" */ "../views/ExerciseMenu.vue"),
       },
       {
+        path: "vocabularies",
+        name: "Vocabularies",
+        component: () =>
+          import(/* webpackChunkName: 'lang' */ "../views/MainLayout.vue"),
+        beforeEnter: async () => {
+          const continueRoute = await fetchData(
+            VocabularyActionTypes.getVocabularies,
+            VocabulariesGetterTypes.totalCount,
+            true
+          );
+          if (!continueRoute) {
+            return continueRoute;
+          }
+        },
+        children: [
+          {
+            path: "",
+            name: "VocabulariesList",
+            component: () =>
+              import(
+                /* webpackChunkName: 'configuration' */ "../views/Vocabularies/List.vue"
+              ),
+          },
+          {
+            path: "nouveau",
+            name: "AddVocabulary",
+            component: () =>
+              import(
+                /* webpackChunkName: 'configuration' */ "../views/Vocabularies/Form.vue"
+              ),
+          },
+          {
+            path: ":id",
+            name: "EditVocabulary",
+            component: () =>
+              import(
+                /* webpackChunkName: 'configuration' */ "../views/Vocabularies/Form.vue"
+              ),
+          },
+        ],
+      },
+      {
         path: "exercices",
         name: "Exercises",
         component: () =>
@@ -31,68 +104,40 @@ const routes: Array<RouteRecordRaw> = [
         children: [
           {
             path: "verbe-irreguliers",
-            name: "IrregularVerbs",
+            name: "IrregularVerbsExercise",
             component: () =>
               import(
                 /* webpackChunkName: "exercises" */ "../views/IrregularVerbs.vue"
               ),
             beforeEnter: async () => {
-              const $store = useStore();
-              let fetchData = false;
-              try {
-                if ($store.getters.totalCount === 0) {
-                  fetchData = true;
-                  await $store.dispatch(ActionTypes.GetVerbs);
-                }
-              } catch (err) {
-                console.error(err);
-                $store.dispatch(
-                  ToastActionTypes.show,
-                  "Erreur, le serveur est inaccessible,\nil nous est impossible d'afficher les exercices."
-                );
-                return false;
-              }
-              if (fetchData && $store.getters.totalCount === 0) {
-                $store.dispatch(
-                  ToastActionTypes.show,
-                  "Aucune donnée n'a été récupérée pour lancer l'exercice, veuillez d'avoir ajouté des verbes/mots avant de lancer un exercice."
-                );
-                return false;
+              const continueRoute = await fetchData(
+                ActionTypes.GetVerbs,
+                "totalCount",
+                false,
+                true
+              );
+
+              if (!continueRoute) {
+                return continueRoute;
               }
             },
           },
           {
             path: "vocabulaires",
-            name: "Vocabularies",
+            name: "VocabulariesExercise",
             component: () =>
               import(
-                /* webpackChunkName: "exercises" */ "../views/IrregularVerbs.vue"
+                /* webpackChunkName: "exercises" */ "../views/Vocabularies.vue"
               ),
             beforeEnter: async () => {
-              const $store = useStore();
-              let fetchData = false;
-              try {
-                if ($store.getters[VocabulariesGetterTypes.totalCount] === 0) {
-                  fetchData = true;
-                  await $store.dispatch(VocabularyActionTypes.getVocabularies);
-                }
-              } catch (err) {
-                console.error(err);
-                $store.dispatch(
-                  ToastActionTypes.show,
-                  "Erreur, le serveur est inaccessible, \nil nous est impossible d'afficher les exercices."
-                );
-                return false;
-              }
-              if (
-                fetchData &&
-                $store.getters[VocabulariesGetterTypes.totalCount] === 0
-              ) {
-                $store.dispatch(
-                  ToastActionTypes.show,
-                  "Aucun mot de vocabulaire n'a été récupérée pour lancer l'exercice, \nveuillez d'abord ajouté des mots de vocabulaires avant de lancer un exercice."
-                );
-                return false;
+              const continueRoute = await fetchData(
+                VocabularyActionTypes.getVocabularies,
+                VocabulariesGetterTypes.totalCount,
+                false,
+                true
+              );
+              if (!continueRoute) {
+                return continueRoute;
               }
             },
           },
