@@ -1,4 +1,4 @@
-import { Answer, Exercise } from "@/models";
+import { Answer, Exercise, isIrregularVerb } from "@/models";
 import {
   computed,
   ComputedRef,
@@ -26,6 +26,7 @@ export type UseExercise<T extends Exercise> = {
   getCorrections: ComputedRef<[T, T][]>;
   totalExercises: ComputedRef<number>;
   remainingExercises: ComputedRef<number>;
+  isIrregularVerb: ComputedRef<boolean | undefined>;
   selectRandomFieldName: (record: T) => keyof T;
   checkAnswer: (answer: string, solution: string) => boolean;
   findFirstFieldToEdit: (
@@ -55,6 +56,10 @@ export function useExercise<T extends Exercise>(data?: T[]): UseExercise<T> {
   );
   const remainingRecords = computed(() =>
     state.data.filter((r) => !state.exerciseDoneIds.includes(r.id))
+  );
+
+  const _isIrregularVerb = computed(() =>
+    state.data.length > 0 ? isIrregularVerb(state.data[0]) : undefined
   );
 
   function selectRandomFieldName(record: T): keyof T {
@@ -155,6 +160,7 @@ export function useExercise<T extends Exercise>(data?: T[]): UseExercise<T> {
     getCorrections,
     remainingExercises,
     totalExercises,
+    isIrregularVerb: _isIrregularVerb,
     selectRandomFieldName,
     checkAnswer,
     findFirstFieldToEdit,

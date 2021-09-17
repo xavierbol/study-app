@@ -1,17 +1,13 @@
 <template>
-  <tr class="nes-text is-error">
-    <td>{{ wrongVocabulary.word }}</td>
-    <td>{{ wrongVocabulary.translation }}</td>
-  </tr>
-  <tr class="nes-text is-success">
-    <td>{{ expectedVocabulary.word }}</td>
-    <td>{{ expectedVocabulary.translation }}</td>
-  </tr>
+  <VocabularyRow class="nes-text is-error" :vocabulary="wrongVocabulary" />
+  <VocabularyRow class="nes-text is-success" :vocabulary="expectedVocabulary" />
 </template>
 
 <script lang="ts" setup>
 import { defineProps, PropType } from "vue";
 import { Exercise, Vocabulary } from "@/models";
+
+import VocabularyRow from "./VocabularyRow.vue";
 
 const props = defineProps({
   wrongAnswer: { type: Object as PropType<Exercise>, required: true },

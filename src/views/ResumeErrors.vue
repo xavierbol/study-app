@@ -3,12 +3,8 @@
   <div class="nes-table-responsive">
     <table class="nes-table is-bordered">
       <thead>
-        <tr>
-          <th>Infinitif</th>
-          <th>Passé simple</th>
-          <th>Participe passé</th>
-          <th>Traduction</th>
-        </tr>
+        <IrregularVerbHeader v-if="!!isIrregularVerb" />
+        <VocabularyHeader v-else />
       </thead>
       <tbody>
         <CorrectionElement
@@ -16,6 +12,7 @@
           :key="index"
           :badAnswer="badAnswer"
           :expectedAnswer="expectedAnswer"
+          :is-irregular-verb="!!isIrregularVerb"
         />
       </tbody>
     </table>
@@ -29,28 +26,26 @@
 </template>
 
 <script lang="ts" setup>
-import { DeepReadonly, inject, Ref, ToRefs, UnwrapRef } from "vue";
+import { computed, inject } from "vue";
 import { useRouter } from "vue-router";
 
-import { Answer, Exercise } from "@/models";
+import { Exercise } from "@/models";
 import { UseExercise } from "@/hooks/useExercise";
 
 import CorrectionElement from "@/components/CorrectionElement.vue";
+import IrregularVerbHeader from "@/components/IrregularVerbHeader.vue";
+import VocabularyHeader from "@/components/VocabularyHeader.vue";
 
 const $router = useRouter();
-type AnswerInjected = {
-  answers: DeepReadonly<
-    UnwrapRef<Ref<ToRefs<Record<number, Answer<Exercise>>>>>
-  >;
-  type: "Irregular Verb" | "Vocabulary";
-};
-const exerciseDone = inject("exercise");
+const exerciseDone = inject("exercise") as UseExercise<Exercise> | undefined;
 
 let corrections: Array<[Exercise, Exercise]> = [];
-if (exerciseDone === undefined) {
+const isIrregularVerb = computed(() => false);
+if (exerciseDone === undefined || !exerciseDone.getCorrections.value.length) {
   $router.push("/");
 } else {
-  const { getCorrections } = exerciseDone as UseExercise<Exercise>;
+  const { getCorrections, isIrregularVerb } =
+    exerciseDone as UseExercise<Exercise>;
   corrections = getCorrections.value;
 }
 
