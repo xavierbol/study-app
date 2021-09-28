@@ -1,3 +1,5 @@
+export type Language = "nl" | "en";
+
 export interface IrregularVerb {
   id: number;
   infinitive: string;

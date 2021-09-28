@@ -188,7 +188,7 @@ const {
   checkAnswer,
   findFirstFieldToEdit,
 } = inject("exercise") as UseExercise<IrregularVerb>;
-setData($store.state.verbs);
+setData($store.state.irregularVerb.verbs);
 
 const dialogRef: Ref<HTMLDialogElement | null> = ref(null);
 const verb = getExercise as ComputedRef<IrregularVerb>;

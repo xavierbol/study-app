@@ -1,14 +1,9 @@
-import { IrregularVerb } from "@/models";
-
 export interface State {
-  loading: boolean;
-  verbs: IrregularVerb[];
-  error?: string;
+  lang: "nl" | "en";
 }
 
 const defaultState: State = {
-  loading: false,
-  verbs: [],
+  lang: "nl",
 };
 
 export default defaultState;

@@ -41,8 +41,8 @@
 </template>
 
 <script setup lang="ts">
-import { Language, useLang } from "@/hooks/useLang";
-import { Vocabulary } from "@/models";
+import { useLang } from "@/hooks/useLang";
+import { Vocabulary, Language } from "@/models";
 import { VocabularyActionTypes } from "@/store/vocabulary/actions";
 import { VocabulariesGetterTypes } from "@/store/vocabulary/getters";
 import { computed, ComputedRef, reactive } from "@vue/reactivity";

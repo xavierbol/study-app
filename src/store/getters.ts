@@ -1,18 +1,19 @@
 import { IrregularVerb } from "@/models";
+import { getRoute } from "@/utils";
 import { GetterTree } from "vuex";
 import { State } from "./state";
 
 export type Getters = {
-  totalCount: (state: State) => number;
-  getVerb: (state: State) => (id: number) => IrregularVerb | undefined;
+  getApiRoute: (state: State) => (path: string) => string;
+  getLang: (state: State) => string;
 };
 
 const getters: GetterTree<State, State> & Getters = {
-  totalCount(state) {
-    return state.verbs.length;
+  getApiRoute(state) {
+    return (path) => getRoute(`/${state.lang}${path}`);
   },
-  getVerb(state) {
-    return (id: number) => state.verbs.find((verb) => verb.id === id);
+  getLang(state) {
+    return state.lang === "nl" ? "néerlandais" : "anglais";
   },
 };
 

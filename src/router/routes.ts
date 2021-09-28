@@ -1,17 +1,19 @@
-import { ActionTypes } from "@/store/actions";
+import { RouteLocationNormalized, RouteRecordRaw } from "vue-router";
+import { useStore } from "@/store";
+import { IrregularVerbActionTypes } from "@/store/irregular-verb/actions";
+import { IrregularVerbsGetterTypes } from "@/store/irregular-verb/getters";
 import { ToastActionTypes } from "@/store/toast/actions";
 import { VocabularyActionTypes } from "@/store/vocabulary/actions";
 import { VocabulariesGetterTypes } from "@/store/vocabulary/getters";
-import { RouteRecordRaw } from "vue-router";
-import { useStore } from "vuex";
 
 import Home from "../views/Home.vue";
+import { IrregularVerbMutationTypes } from "@/store/irregular-verb/mutations";
 
 async function fetchData(
-  action: ActionTypes | VocabularyActionTypes,
-  getterName: "totalCount" | "vocabulary/totalCount",
+  action: IrregularVerbActionTypes | VocabularyActionTypes,
+  getterName: "irregularVerb/totalCount" | "vocabulary/totalCount",
   fetch = false,
-  requireData = false
+  requireData = false,
 ): Promise<boolean> {
   const $store = useStore();
   let fetchData = false;
@@ -112,8 +114,8 @@ const routes: Array<RouteRecordRaw> = [
               ),
             beforeEnter: async (): Promise<void | boolean> => {
               const continueRoute = await fetchData(
-                ActionTypes.GetVerbs,
-                "totalCount",
+                IrregularVerbActionTypes.GetVerbs,
+                IrregularVerbsGetterTypes.totalCount,
                 false,
                 true
               );
