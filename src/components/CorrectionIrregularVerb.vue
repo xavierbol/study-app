@@ -3,7 +3,7 @@
     <td>{{ wrongIrregularVerb.infinitive }}</td>
     <td>
       {{ wrongIrregularVerb.past_simple }} -
-      {{ wrongIrregularVerb.past_simple_2 }}
+      {{ wrongIrregularVerb.past_simple2 }}
     </td>
     <td>{{ wrongIrregularVerb.past_participle }}</td>
     <td>{{ wrongIrregularVerb.translation }}</td>
@@ -12,7 +12,7 @@
     <td>{{ expectedIrregularVerb.infinitive }}</td>
     <td>
       {{ expectedIrregularVerb.past_simple }} -
-      {{ expectedIrregularVerb.past_simple_2 }}
+      {{ expectedIrregularVerb.past_simple2 }}
     </td>
     <td>{{ expectedIrregularVerb.past_participle }}</td>
     <td>{{ expectedIrregularVerb.translation }}</td>

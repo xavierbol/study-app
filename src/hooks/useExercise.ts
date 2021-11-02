@@ -64,7 +64,8 @@ export function useExercise<T extends Exercise>(data?: T[]): UseExercise<T> {
 
   function selectRandomFieldName(record: T): keyof T {
     const fieldNames = (Object.keys(record) as Array<keyof T>).filter(
-      (key) => key !== "id" && record[key]
+      (key) =>
+        !(["id", "language_id"] as Array<keyof T>).includes(key) && record[key]
     );
     return fieldNames[getRandomIndex(fieldNames.length)] as keyof T;
   }
@@ -75,10 +76,7 @@ export function useExercise<T extends Exercise>(data?: T[]): UseExercise<T> {
     const remainingRecordToDo = remainingRecords.value;
     if (remainingExercisesToDo === 1) return remainingRecordToDo[0];
     // return a number in this interval: [0; totalCount[
-    const exercise =
-      remainingRecordToDo[getRandomIndex(remainingExercisesToDo)];
-    console.log(exercise);
-    return exercise;
+    return remainingRecordToDo[getRandomIndex(remainingExercisesToDo)];
   });
 
   const getCorrections = computed((): Array<[T, T]> => {

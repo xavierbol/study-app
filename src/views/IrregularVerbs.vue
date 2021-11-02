@@ -45,22 +45,22 @@
       </div>
 
       <div class="nes-field col-6">
-        <label for="past_simple_2">Imparfait (pluriel)</label>
+          <label for="past_simple2">Imparfait (pluriel)</label>
         <input
-          v-model.trim="irregularVerbForm.past_simple_2"
+            v-model.trim="irregularVerbForm.past_simple2"
           type="text"
-          name="past_simple_2"
+            name="past_simple2"
           :class="`nes-input ${
-            showErrors && fieldName !== 'past_simple_2'
-              ? invalidField('past_simple_2')
+              showErrors && fieldName !== 'past_simple2'
+                ? invalidField('past_simple2')
                 ? 'is-error'
                 : 'is-success'
               : ''
           }`"
-          :disabled="fieldName === 'past_simple_2'"
+            :disabled="fieldName === 'past_simple2'"
         />
-        <span class="nes-text is-error" v-if="invalidField('past_simple_2')">
-          Imparfait correct : {{ verb.past_simple_2 }}
+          <span class="nes-text is-error" v-if="invalidField('past_simple2')">
+            Imparfait correct : {{ verb.past_simple2 }}
         </span>
       </div>
     </div>
@@ -200,7 +200,7 @@ const irregularVerbForm = reactive<IrregularVerb>(
       id: verb.value.id,
       infinitive: "",
       past_simple: "",
-      past_simple_2: "",
+      past_simple2: "",
       past_participle: "",
       translation: "",
     },
@@ -222,7 +222,7 @@ function reset(): void {
       id: verb.value.id,
       infinitive: "",
       past_simple: "",
-      past_simple_2: "",
+      past_simple2: "",
       past_participle: "",
       translation: "",
     },
@@ -233,7 +233,7 @@ function reset(): void {
   const inputName = findFirstFieldToEdit(fieldName.value, [
     "infinitive",
     "past_simple",
-    "past_simple_2",
+    "past_simple2",
     "past_participle",
     "translation",
   ]);
@@ -251,11 +251,8 @@ function onSubmit(): void {
       !checkAnswer(irregularVerbForm.infinitive, verb.value.infinitive)) ||
     (fieldName.value !== "past_simple" &&
       !checkAnswer(irregularVerbForm.past_simple, verb.value.past_simple)) ||
-    (fieldName.value !== "past_simple_2" &&
-      !checkAnswer(
-        irregularVerbForm.past_simple_2,
-        verb.value.past_simple_2
-      )) ||
+    (fieldName.value !== "past_simple2" &&
+      !checkAnswer(irregularVerbForm.past_simple2, verb.value.past_simple2)) ||
     (fieldName.value !== "past_participle" &&
       !checkAnswer(
         irregularVerbForm.past_participle,

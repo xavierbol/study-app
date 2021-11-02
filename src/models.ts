@@ -4,7 +4,7 @@ export interface IrregularVerb {
   id: number;
   infinitive: string;
   past_simple: string;
-  past_simple_2: string;
+  past_simple2: string;
   past_participle: string;
   translation: string;
 }
