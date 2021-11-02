@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from "vue";
+import { computed, ComputedRef, inject } from "vue";
 import { useRouter } from "vue-router";
 
 import { Exercise } from "@/models";
@@ -40,13 +40,14 @@ const $router = useRouter();
 const exerciseDone = inject("exercise") as UseExercise<Exercise> | undefined;
 
 let corrections: Array<[Exercise, Exercise]> = [];
-const isIrregularVerb = computed(() => false);
+let isIrregularVerb: ComputedRef<boolean | undefined> = computed(() => false);
 if (exerciseDone === undefined || !exerciseDone.getCorrections.value.length) {
   $router.push("/");
 } else {
-  const { getCorrections, isIrregularVerb } =
+  const { getCorrections, isIrregularVerb: _isIrregularVerb } =
     exerciseDone as UseExercise<Exercise>;
   corrections = getCorrections.value;
+  isIrregularVerb = _isIrregularVerb;
 }
 
 function onReturnMenu(): void {

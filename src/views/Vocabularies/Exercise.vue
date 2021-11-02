@@ -47,7 +47,9 @@
 
     <div class="flex justify-around buttons">
       <Button type="submit" color="success">Valider</Button>
-      <Button type="button" color="primary" to="/">Quitter</Button>
+      <Button type="button" color="primary" @click="leaveExercise">
+        Quitter
+      </Button>
       <Button type="reset" color="danger">Réinitialiser</Button>
     </div>
   </form>
@@ -158,6 +160,16 @@ function invalidField(fieldName: keyof Vocabulary) {
 }
 
 const language = useLang($route.params.lang as Language);
+
+function leaveExercise() {
+  if (state.wrongAnswerCount > 0) {
+    if (dialogRef.value) {
+      dialogRef.value.showModal();
+      return;
+    }
+  }
+  $router.push("/");
+}
 
 function onReset(): void {
   Object.assign(

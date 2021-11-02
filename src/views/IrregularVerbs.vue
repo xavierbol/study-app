@@ -1,168 +1,180 @@
 <template>
   <MainContainer title="Verbes irréguliers">
-  <form autocomplete="off" @submit.prevent="onSubmit">
-    <div class="row">
-      <div class="nes-field w-full">
-        <label for="infinitive">Infinitif</label>
-        <input
-          v-model.trim="irregularVerbForm.infinitive"
-          type="text"
-          name="infinitive"
-          :class="`nes-input ${
-            showErrors && fieldName !== 'infinitive'
-              ? invalidField('infinitive')
-                ? 'is-error'
-                : 'is-success'
-              : ''
-          }`"
-          :disabled="fieldName === 'infinitive'"
-        />
-        <span class="nes-text is-error" v-if="invalidField('infinitive')">
-          Infinitif correct : {{ verb.infinitive }}
-        </span>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="nes-field col-6 mr-2">
-        <label for="past_simple">Imparfait (singulier)</label>
-        <input
-          v-model.trim="irregularVerbForm.past_simple"
-          type="text"
-          name="past_simple"
-          :class="`nes-input ${
-            showErrors && fieldName !== 'past_simple'
-              ? invalidField('past_simple')
-                ? 'is-error'
-                : 'is-success'
-              : ''
-          }`"
-          :disabled="fieldName === 'past_simple'"
-        />
-        <span class="nes-text is-error" v-if="invalidField('past_simple')">
-          Imparfait correct : {{ verb.past_simple }}
-        </span>
+    <form autocomplete="off" @submit.prevent="onSubmit">
+      <div class="row">
+        <div class="nes-field w-full">
+          <label for="infinitive">Infinitif</label>
+          <input
+            v-model.trim="irregularVerbForm.infinitive"
+            type="text"
+            name="infinitive"
+            :class="`nes-input ${
+              showErrors && fieldName !== 'infinitive'
+                ? invalidField('infinitive')
+                  ? 'is-error'
+                  : 'is-success'
+                : ''
+            }`"
+            :disabled="fieldName === 'infinitive'"
+          />
+          <span class="nes-text is-error" v-if="invalidField('infinitive')">
+            Infinitif correct : {{ verb.infinitive }}
+          </span>
+        </div>
       </div>
 
-      <div class="nes-field col-6">
+      <div class="row">
+        <div class="nes-field col-6 mr-2">
+          <label for="past_simple">Imparfait (singulier)</label>
+          <input
+            v-model.trim="irregularVerbForm.past_simple"
+            type="text"
+            name="past_simple"
+            :class="`nes-input ${
+              showErrors && fieldName !== 'past_simple'
+                ? invalidField('past_simple')
+                  ? 'is-error'
+                  : 'is-success'
+                : ''
+            }`"
+            :disabled="fieldName === 'past_simple'"
+          />
+          <span class="nes-text is-error" v-if="invalidField('past_simple')">
+            Imparfait correct : {{ verb.past_simple }}
+          </span>
+        </div>
+
+        <div class="nes-field col-6">
           <label for="past_simple2">Imparfait (pluriel)</label>
-        <input
+          <input
             v-model.trim="irregularVerbForm.past_simple2"
-          type="text"
+            type="text"
             name="past_simple2"
-          :class="`nes-input ${
+            :class="`nes-input ${
               showErrors && fieldName !== 'past_simple2'
                 ? invalidField('past_simple2')
-                ? 'is-error'
-                : 'is-success'
-              : ''
-          }`"
+                  ? 'is-error'
+                  : 'is-success'
+                : ''
+            }`"
             :disabled="fieldName === 'past_simple2'"
-        />
+          />
           <span class="nes-text is-error" v-if="invalidField('past_simple2')">
             Imparfait correct : {{ verb.past_simple2 }}
+          </span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="nes-field w-full">
+          <label for="past_participle">Participe passé</label>
+          <input
+            v-model.trim="irregularVerbForm.past_participle"
+            type="text"
+            name="past_participle"
+            :class="`nes-input ${
+              showErrors && fieldName !== 'past_participle'
+                ? invalidField('past_participle')
+                  ? 'is-error'
+                  : 'is-success'
+                : ''
+            }`"
+            :disabled="fieldName === 'past_participle'"
+          />
+          <span
+            class="nes-text is-error"
+            v-if="invalidField('past_participle')"
+          >
+            Participe passé correct : {{ verb.past_participle }}
+          </span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="nes-field w-full">
+          <label for="translation">Traduction</label>
+          <input
+            v-model.trim="irregularVerbForm.translation"
+            type="text"
+            name="translation"
+            :class="`nes-input ${
+              showErrors && fieldName !== 'translation'
+                ? invalidField('translation')
+                  ? 'is-error'
+                  : 'is-success'
+                : ''
+            }`"
+            :disabled="fieldName === 'translation'"
+          />
+          <span class="nes-text is-error" v-if="invalidField('translation')">
+            Traduction correcte : {{ verb.translation }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex justify-around buttons">
+        <Button type="submit" color="success">Valider</Button>
+        <Button type="button" color="primary" @click="leaveExercise"
+          >Quitter</Button
+        >
+        <Button type="button" color="danger" @click="reset"
+          >Réinitialiser</Button
+        >
+      </div>
+    </form>
+    <div class="flex justify-between">
+      <div v-if="totalExercises - remainingExercises <= 10">
+        <i
+          v-for="i in state.goodAnswerCount"
+          class="nes-icon coin"
+          :key="i"
+        ></i>
+        <i
+          v-for="i in state.wrongAnswerCount"
+          class="nes-icon close"
+          :key="i"
+        ></i>
+      </div>
+      <div v-else>
+        <span v-if="state.goodAnswerCount > 0" class="nes-text">
+          <i class="nes-icon coin"></i> x
+          {{ state.goodAnswerCount }}
+        </span>
+        <span v-if="state.wrongAnswerCount > 0" class="nes-text">
+          <i class="nes-icon close"></i> x
+          {{ state.wrongAnswerCount }}
         </span>
       </div>
-    </div>
-
-    <div class="row">
-      <div class="nes-field w-full">
-        <label for="past_participle">Participe passé</label>
-        <input
-          v-model.trim="irregularVerbForm.past_participle"
-          type="text"
-          name="past_participle"
-          :class="`nes-input ${
-            showErrors && fieldName !== 'past_participle'
-              ? invalidField('past_participle')
-                ? 'is-error'
-                : 'is-success'
-              : ''
-          }`"
-          :disabled="fieldName === 'past_participle'"
-        />
-        <span class="nes-text is-error" v-if="invalidField('past_participle')">
-          Participe passé correct : {{ verb.past_participle }}
-        </span>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="nes-field w-full">
-        <label for="translation">Traduction</label>
-        <input
-          v-model.trim="irregularVerbForm.translation"
-          type="text"
-          name="translation"
-          :class="`nes-input ${
-            showErrors && fieldName !== 'translation'
-              ? invalidField('translation')
-                ? 'is-error'
-                : 'is-success'
-              : ''
-          }`"
-          :disabled="fieldName === 'translation'"
-        />
-        <span class="nes-text is-error" v-if="invalidField('translation')">
-          Traduction correcte : {{ verb.translation }}
-        </span>
-      </div>
-    </div>
-
-    <div class="flex justify-around buttons">
-      <Button type="submit" color="success">Valider</Button>
-      <Button type="button" color="danger" @click="reset">Réinitialiser</Button>
-    </div>
-  </form>
-  <div class="flex justify-between">
-    <div v-if="totalExercises - remainingExercises <= 10">
-      <i v-for="i in state.goodAnswerCount" class="nes-icon coin" :key="i"></i>
-      <i
-        v-for="i in state.wrongAnswerCount"
-        class="nes-icon close"
-        :key="i"
-      ></i>
-    </div>
-    <div v-else>
-      <span v-if="state.goodAnswerCount > 0" class="nes-text">
-        <i class="nes-icon coin"></i> x
-        {{ state.goodAnswerCount }}
+      <span class="nes-text">
+        {{ `${totalExercises - remainingExercises + 1} / ${totalExercises}` }}
       </span>
-      <span v-if="state.wrongAnswerCount > 0" class="nes-text">
-        <i class="nes-icon close"></i> x
-        {{ state.wrongAnswerCount }}
-      </span>
     </div>
-    <span class="nes-text">
-      {{ `${totalExercises - remainingExercises + 1} / ${totalExercises}` }}
-    </span>
-  </div>
 
-  <dialog
-    ref="dialogRef"
-    class="nes-dialog is-rounded dialog"
-    id="dialog-dark-rounded"
-  >
-    <p class="title text-center">Exercice terminé !</p>
-    <p class="text-center">
-      Vous venez de parcourir <br />
-      tous les verbes irréguliers <br />
-      de cet exercice.
-    </p>
-    <p class="text-center" v-if="state.wrongAnswerCount > 0">
-      Voulez-vous réviser vos erreurs ?
-    </p>
-    <menu class="dialog-menu flex justify-around">
-      <Button
-        v-if="state.wrongAnswerCount > 0"
-        color="primary"
-        @click="onResumeErrors"
-      >
-        Oui
-      </Button>
-      <Button color="secondary" @click="onReturnMenu">Non</Button>
-    </menu>
-  </dialog>
+    <dialog
+      ref="dialogRef"
+      class="nes-dialog is-rounded dialog"
+      id="dialog-dark-rounded"
+    >
+      <p class="title text-center">Exercice terminé !</p>
+      <p class="text-center">
+        Vous venez de parcourir <br />
+        tous les verbes irréguliers <br />
+        de cet exercice.
+      </p>
+      <p class="text-center" v-if="state.wrongAnswerCount > 0">
+        Voulez-vous réviser vos erreurs ?
+      </p>
+      <menu class="dialog-menu flex justify-around">
+        <Button
+          v-if="state.wrongAnswerCount > 0"
+          color="primary"
+          @click="onResumeErrors"
+        >
+          Oui
+        </Button>
+        <Button color="secondary" @click="onReturnMenu">Non</Button>
+      </menu>
+    </dialog>
   </MainContainer>
 </template>
 
@@ -215,6 +227,16 @@ function invalidField(fieldName: keyof IrregularVerb) {
   return (
     showErrors.value && irregularVerbForm[fieldName] !== verb.value[fieldName]
   );
+}
+
+function leaveExercise() {
+  if (state.wrongAnswerCount > 0) {
+    if (dialogRef.value) {
+      dialogRef.value.showModal();
+      return;
+    }
+  }
+  $router.push("/");
 }
 
 function reset(): void {
