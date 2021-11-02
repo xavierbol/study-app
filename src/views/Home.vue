@@ -1,5 +1,9 @@
 <template>
-  <MainContainer question="Choisissez une langue à exercer">
+  <MainContainer
+    question="Choisissez une langue à exercer"
+    :menu="true"
+    :center="true"
+  >
     <Button to="/nl"> Néerlandais </Button>
     <Button to="/en" disabled> Anglais </Button>
   </MainContainer>

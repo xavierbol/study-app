@@ -1,25 +1,28 @@
 <template>
-  <section
-    :class="
-      `nes-container is-centered with-title h-screen ${classNames}`.trim()
-    "
-  >
+  <section :class="sectionClassNames.trim()">
     <h1 class="title">{{ title }}</h1>
-    <p>{{ question }}</p>
-    <div class="menu flex flex-column justify-evenly">
+    <p v-if="question">{{ question }}</p>
+    <div v-if="menu" class="menu flex flex-column justify-evenly">
       <slot></slot>
     </div>
+    <slot v-else></slot>
   </section>
 </template>
 
 <script lang="ts" setup>
 import { defineProps } from "vue";
 
-defineProps({
+const props = defineProps({
   classNames: String,
-  title: { type: String, required: true, default: "Study App" },
-  question: { type: String, required: true },
+  title: { type: String, default: "Study App" },
+  question: String,
+  menu: Boolean,
+  center: Boolean,
 });
+
+let sectionClassNames = `nes-container ${
+  props.center ? "is-centered" : ""
+} with-title h-screen ${props.classNames}`;
 </script>
 
 <style scoped>

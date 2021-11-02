@@ -1,5 +1,5 @@
 <template>
-  <h1 class="title">Verbes irréguliers</h1>
+  <MainContainer title="Verbes irréguliers">
   <form autocomplete="off" @submit.prevent="onSubmit">
     <div class="row">
       <div class="nes-field w-full">
@@ -163,6 +163,7 @@
       <Button color="secondary" @click="onReturnMenu">Non</Button>
     </menu>
   </dialog>
+  </MainContainer>
 </template>
 
 <script lang="ts" setup>
@@ -173,6 +174,7 @@ import { useStore } from "@/store";
 import { IrregularVerb } from "@/models";
 import { UseExercise } from "@/hooks/useExercise";
 
+import MainContainer from "@/components/MainContainer.vue";
 import Button from "@/components/Button.vue";
 
 const $store = useStore();

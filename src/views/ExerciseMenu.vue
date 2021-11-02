@@ -1,5 +1,10 @@
 <template>
-  <MainContainer title="Study App" question="Que souhaitez-vous faire ?">
+  <MainContainer
+    title="Study App"
+    question="Que souhaitez-vous faire ?"
+    :menu="true"
+    :center="true"
+  >
     <Button :to="`${prefix}/exercices/verbe-irreguliers`">
       Verbes irréguliers en {{ language }}
     </Button>

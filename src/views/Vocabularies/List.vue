@@ -1,6 +1,5 @@
 <template>
-  <h1 class="title">Liste de vocabulaires</h1>
-  <Button class="returnBtn" color="primary" @click="returnBack">Retour</Button>
+  <MainContainer title="Liste de vocabulaires">
   <div class="nes-table-responsive">
     <table class="nes-table is-bordered">
       <thead>
@@ -22,12 +21,14 @@
   <Button color="danger" :to="$route.path + '/nouveau'" float>
     <span>+</span>
   </Button>
+  </MainContainer>
 </template>
 
 <script setup lang="ts">
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "@/store";
 
+import MainContainer from "@/components/MainContainer.vue";
 import VocabularyHeader from "@/components/VocabularyHeader.vue";
 import VocabularyRow from "@/components/VocabularyRow.vue";
 import Button from "@/components/Button.vue";

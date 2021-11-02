@@ -1,7 +1,5 @@
 <template>
-  <h1 class="title">
-    {{ editMode ? "Edition" : "Ajout d'un nouveau mot de vocabulaire" }}
-  </h1>
+  <MainContainer :title="title">
   <form @submit.prevent="submit">
     <div class="row">
       <div class="nes-field w-full">
@@ -38,6 +36,7 @@
       <Button type="button" color="danger" @click="returnBack">Retour</Button>
     </div>
   </form>
+  </MainContainer>
 </template>
 
 <script setup lang="ts">
@@ -49,6 +48,7 @@ import { computed, ComputedRef, reactive } from "@vue/reactivity";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 
+import MainContainer from "@/components/MainContainer.vue";
 import Button from "@/components/Button.vue";
 
 const $store = useStore();
