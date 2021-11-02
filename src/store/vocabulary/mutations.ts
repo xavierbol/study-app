@@ -1,4 +1,4 @@
-import { Vocabulary } from "@/models";
+import { Category, Vocabulary } from "@/models";
 import { MutationTree } from "vuex";
 import { VocabularyState } from "./state";
 
@@ -7,6 +7,7 @@ export enum MutationType {
   setVocabularies = "SET_VOCABULARIES",
   removeVocabulary = "REMOVE_VOCABULARY",
   updateVocabulary = "UPDATE_VOCABULARY",
+  setCategories = "SET_CATEGORIES",
   setLoading = "SET_LOADING",
   setError = "SET_ERROR",
 }
@@ -19,6 +20,7 @@ export type Mutations<S = VocabularyState> = {
     state: S,
     payload: Partial<Vocabulary> & { id: number }
   ): void;
+  [MutationType.setCategories](state: S, payload: Category[]): void;
   [MutationType.setLoading](state: S, payload: boolean): void;
   [MutationType.setError](state: S, payload: string): void;
 };
@@ -47,6 +49,10 @@ export const mutations: MutationTree<VocabularyState> & Mutations = {
       ...vocabularyUpdated,
     };
   },
+  [MutationType.setCategories](state, categories) {
+    state.categories = categories;
+    state.error = undefined;
+  },
   [MutationType.setLoading](state, loading) {
     state.loading = loading;
   },
@@ -60,6 +66,7 @@ export enum VocabularyMutationTypes {
   setVocabularies = "vocabulary/SET_VOCABULARIES",
   removeVocabulary = "vocabulary/REMOVE_VOCABULARY",
   updateVocabulary = "vocabulary/UPDATE_VOCABULARY",
+  setCategories = "vocabulary/SET_CATEGORIES",
   setLoading = "vocabulary/SET_LOADING",
   setError = "vocabulary/SET_ERROR",
 }
@@ -78,6 +85,7 @@ export type VocabularyMutations<S = VocabularyState> = {
     state: S,
     payload: Partial<Vocabulary> & { id: number }
   ): void;
+  [VocabularyMutationTypes.setCategories](state: S, payload: Category[]): void;
   [VocabularyMutationTypes.setLoading](state: S, payload: boolean): void;
   [VocabularyMutationTypes.setError](state: S, payload: string): void;
 };

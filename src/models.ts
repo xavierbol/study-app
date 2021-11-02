@@ -9,10 +9,17 @@ export interface IrregularVerb {
   translation: string;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  description?: string;
+}
+
 export interface Vocabulary {
   id: number;
   word: string;
   translation: string;
+  category_id: number | "";
 }
 
 export type Exercise = IrregularVerb | Vocabulary;

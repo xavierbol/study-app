@@ -47,6 +47,7 @@
 
     <div class="flex justify-around buttons">
       <Button type="submit" color="success">Valider</Button>
+      <Button type="button" color="primary" to="/">Quitter</Button>
       <Button type="reset" color="danger">Réinitialiser</Button>
     </div>
   </form>
@@ -102,7 +103,7 @@
       >
         Oui
       </Button>
-      <Button color="secondary" @click="onReturnMenu">Non</Button>
+      <Button color="secondary" to="/">Non</Button>
     </menu>
   </dialog>
 </template>
@@ -142,6 +143,7 @@ const vocabularyForm = reactive<Vocabulary>(
       id: vocabulary.value.id,
       word: "",
       translation: "",
+      category_id: vocabulary.value.category_id,
     },
     { [fieldName.value]: vocabulary.value[fieldName.value] }
   )

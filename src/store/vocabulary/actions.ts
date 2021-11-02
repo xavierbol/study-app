@@ -1,17 +1,20 @@
-import { Vocabulary } from "@/models";
-import { getRoute, headers } from "@/utils";
+import { Category, Vocabulary } from "@/models";
+import { headers } from "@/utils";
 import { ActionContext, ActionTree } from "vuex";
+import { Getters } from "../getters";
 import { State } from "../state";
 import { Mutations, MutationType, VocabularyMutations } from "./mutations";
 import { VocabularyState } from "./state";
 
-const VOCABULARY_URL = getRoute("/vocabularies");
+const VOCABULARY_ROUTE = "/vocabularies";
+const CATEGORY_ROUTE = "/categories";
 
 export enum ActionTypes {
   getVocabularies = "GET_VOCABULARIES",
   deleteVocabulary = "DELETE_VOCABULARY",
   createVocabulary = "CREATE_VOCABULARY",
   updateVocabulary = "UPDATE_VOCABULARY",
+  getCategories = "GET_CATEGORIES",
 }
 
 type AugmentedActionContext = {
@@ -19,34 +22,48 @@ type AugmentedActionContext = {
     key: K,
     payload: Parameters<Mutations[K]>[1]
   ): ReturnType<Mutations[K]>;
+  rootGetters: {
+    [K in keyof Getters]: ReturnType<Getters[K]>;
+  };
 } & Omit<ActionContext<VocabularyState, State>, "commit">;
 
 export interface Actions {
   [ActionTypes.getVocabularies]({
     commit,
+    rootGetters,
   }: AugmentedActionContext): Promise<void>;
   [ActionTypes.createVocabulary](
-    { commit }: AugmentedActionContext,
+    { commit, rootGetters }: AugmentedActionContext,
     payload: Vocabulary
   ): Promise<void>;
   [ActionTypes.deleteVocabulary](
-    { commit }: AugmentedActionContext,
+    { commit, rootGetters }: AugmentedActionContext,
     payload: number
   ): Promise<void>;
   [ActionTypes.updateVocabulary](
-    { commit }: AugmentedActionContext,
+    { commit, rootGetters }: AugmentedActionContext,
     payload: Partial<Vocabulary> & { id: number }
   ): Promise<void>;
+  [ActionTypes.getCategories]({
+    commit,
+    rootGetters,
+  }: AugmentedActionContext): Promise<void>;
 }
 
 export const actions: ActionTree<VocabularyState, State> & Actions = {
-  async [ActionTypes.getVocabularies]({ commit }: AugmentedActionContext) {
+  async [ActionTypes.getVocabularies]({
+    commit,
+    rootGetters,
+  }: AugmentedActionContext) {
     commit(MutationType.setLoading, true);
     try {
-      const result: Response = await fetch(VOCABULARY_URL, {
-        method: "GET",
-        headers,
-      });
+      const result: Response = await fetch(
+        rootGetters.getApiRoute(VOCABULARY_ROUTE),
+        {
+          method: "GET",
+          headers,
+        }
+      );
       if (result.ok) {
         const json = (await result.json()) as Array<Vocabulary>;
         commit(MutationType.setVocabularies, json);
@@ -55,19 +72,22 @@ export const actions: ActionTree<VocabularyState, State> & Actions = {
       }
     } catch (err) {
       console.error(err);
-      commit(MutationType.setError, err);
+      commit(MutationType.setError, String(err));
     } finally {
       commit(MutationType.setLoading, false);
     }
   },
-  async [ActionTypes.createVocabulary]({ commit }, vocabulary) {
+  async [ActionTypes.createVocabulary]({ commit, rootGetters }, vocabulary) {
     commit(MutationType.setLoading, true);
     try {
-      const result: Response = await fetch(VOCABULARY_URL, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(vocabulary),
-      });
+      const result: Response = await fetch(
+        rootGetters.getApiRoute(VOCABULARY_ROUTE),
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify(vocabulary),
+        }
+      );
 
       if (result.ok) {
         const newVocabulary = (await result.json()) as Vocabulary;
@@ -79,16 +99,16 @@ export const actions: ActionTree<VocabularyState, State> & Actions = {
       }
     } catch (error) {
       console.error(error);
-      commit(MutationType.setError, error);
+      commit(MutationType.setError, String(error));
     } finally {
       commit(MutationType.setLoading, false);
     }
   },
-  async [ActionTypes.deleteVocabulary]({ commit }, vocabularyId) {
+  async [ActionTypes.deleteVocabulary]({ commit, rootGetters }, vocabularyId) {
     commit(MutationType.setLoading, true);
     try {
       const result: Response = await fetch(
-        `${VOCABULARY_URL}/${vocabularyId}`,
+        rootGetters.getApiRoute(`${VOCABULARY_ROUTE}/${vocabularyId}`),
         {
           method: "DELETE",
           headers,
@@ -104,16 +124,19 @@ export const actions: ActionTree<VocabularyState, State> & Actions = {
       }
     } catch (error) {
       console.error(error);
-      commit(MutationType.setError, error);
+      commit(MutationType.setError, String(error));
     } finally {
       commit(MutationType.setLoading, false);
     }
   },
-  async [ActionTypes.updateVocabulary]({ commit }, vocabularyUpdated) {
+  async [ActionTypes.updateVocabulary](
+    { commit, rootGetters },
+    vocabularyUpdated
+  ) {
     commit(MutationType.setLoading, true);
     try {
       const result: Response = await fetch(
-        `${VOCABULARY_URL}/${vocabularyUpdated.id}`,
+        rootGetters.getApiRoute(`${VOCABULARY_ROUTE}/${vocabularyUpdated.id}`),
         {
           method: "PUT",
           headers,
@@ -129,7 +152,33 @@ export const actions: ActionTree<VocabularyState, State> & Actions = {
       }
     } catch (err) {
       console.error(err);
-      commit(MutationType.setError, err);
+      commit(MutationType.setError, String(err));
+    } finally {
+      commit(MutationType.setLoading, false);
+    }
+  },
+  async [ActionTypes.getCategories]({
+    commit,
+    rootGetters,
+  }: AugmentedActionContext) {
+    commit(MutationType.setLoading, true);
+    try {
+      const result: Response = await fetch(
+        rootGetters.getApiRoute(CATEGORY_ROUTE),
+        {
+          method: "GET",
+          headers,
+        }
+      );
+      if (result.ok) {
+        const json = (await result.json()) as Array<Category>;
+        commit(MutationType.setCategories, json);
+      } else {
+        commit(MutationType.setError, await result.text());
+      }
+    } catch (err) {
+      console.error(err);
+      commit(MutationType.setError, String(err));
     } finally {
       commit(MutationType.setLoading, false);
     }
@@ -141,9 +190,10 @@ export enum VocabularyActionTypes {
   deleteVocabulary = "vocabulary/DELETE_VOCABULARY",
   createVocabulary = "vocabulary/CREATE_VOCABULARY",
   updateVocabulary = "vocabulary/UPDATE_VOCABULARY",
+  getCategories = "vocabulary/GET_CATEGORIES",
 }
 
-type ToastAugmentedActionContext = {
+type VocabularyAugmentedActionContext = {
   commit<K extends keyof VocabularyMutations>(
     key: K,
     payload: Parameters<VocabularyMutations[K]>[1]
@@ -153,17 +203,22 @@ type ToastAugmentedActionContext = {
 export interface VocabularyActions {
   [VocabularyActionTypes.getVocabularies]({
     commit,
-  }: AugmentedActionContext): Promise<void>;
+    rootGetters,
+  }: VocabularyAugmentedActionContext): Promise<void>;
   [VocabularyActionTypes.createVocabulary](
-    { commit }: AugmentedActionContext,
+    { commit, rootGetters }: VocabularyAugmentedActionContext,
     payload: Vocabulary
   ): Promise<void>;
   [VocabularyActionTypes.deleteVocabulary](
-    { commit }: AugmentedActionContext,
+    { commit, rootGetters }: VocabularyAugmentedActionContext,
     payload: number
   ): Promise<void>;
   [VocabularyActionTypes.updateVocabulary](
-    { commit }: AugmentedActionContext,
+    { commit, rootGetters }: VocabularyAugmentedActionContext,
     payload: Partial<Vocabulary> & { id: number }
   ): Promise<void>;
+  [VocabularyActionTypes.getCategories]({
+    commit,
+    rootGetters,
+  }: VocabularyAugmentedActionContext): Promise<void>;
 }

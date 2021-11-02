@@ -7,13 +7,12 @@ import { VocabularyActionTypes } from "@/store/vocabulary/actions";
 import { VocabulariesGetterTypes } from "@/store/vocabulary/getters";
 
 import Home from "../views/Home.vue";
-import { IrregularVerbMutationTypes } from "@/store/irregular-verb/mutations";
 
 async function fetchData(
   action: IrregularVerbActionTypes | VocabularyActionTypes,
-  getterName: "irregularVerb/totalCount" | "vocabulary/totalCount",
+  getterName: IrregularVerbsGetterTypes | VocabulariesGetterTypes,
   fetch = false,
-  requireData = false,
+  requireData = false
 ): Promise<boolean> {
   const $store = useStore();
   let fetchData = false;
@@ -47,9 +46,9 @@ const routes: Array<RouteRecordRaw> = [
     component: Home,
   },
   {
-    path: "/:lang",
+    path: "/:lang(nl|en)",
     component: () =>
-      import(/* webpackChunkName: "home" */ "../views/LangView.vue"),
+      import(/* webpackChunkName: "home" */ "../views/Parent.vue"),
     children: [
       {
         path: "",
@@ -61,11 +60,12 @@ const routes: Array<RouteRecordRaw> = [
         path: "vocabularies",
         name: "Vocabularies",
         component: () =>
-          import(/* webpackChunkName: 'lang' */ "../views/MainLayout.vue"),
+          import(/* webpackChunkName: 'lang' */ "../views/Parent.vue"),
         beforeEnter: async (): Promise<void | boolean> => {
           const continueRoute = await fetchData(
-            VocabularyActionTypes.getVocabularies,
-            VocabulariesGetterTypes.totalCount,
+            VocabularyActionTypes.getCategories,
+            VocabulariesGetterTypes.countCategories,
+            true,
             true
           );
           if (!continueRoute) {
@@ -75,27 +75,65 @@ const routes: Array<RouteRecordRaw> = [
         children: [
           {
             path: "",
-            name: "VocabulariesList",
+            name: "Categories",
             component: () =>
               import(
-                /* webpackChunkName: 'configuration' */ "../views/Vocabularies/List.vue"
+                /* webpackChunkName: 'configuration' */ "../views/Categories.vue"
               ),
           },
           {
-            path: "nouveau",
-            name: "AddVocabulary",
+            path: ":category_id(\\d+|liste)",
             component: () =>
               import(
-                /* webpackChunkName: 'configuration' */ "../views/Vocabularies/Form.vue"
+                /* webpackChunkName: 'configuration' */ "../views/Parent.vue"
               ),
-          },
-          {
-            path: ":id",
-            name: "EditVocabulary",
-            component: () =>
-              import(
-                /* webpackChunkName: 'configuration' */ "../views/Vocabularies/Form.vue"
-              ),
+            beforeEnter: async (): Promise<void | boolean> => {
+              const continueRoute = await fetchData(
+                VocabularyActionTypes.getVocabularies,
+                VocabulariesGetterTypes.totalCount,
+                true
+              );
+              if (!continueRoute) {
+                return continueRoute;
+              }
+            },
+            children: [
+              {
+                path: "",
+                name: "VocabulariesList",
+                component: () =>
+                  import(
+                    /* webpackChunkName: 'configuration' */ "../views/Vocabularies/List.vue"
+                  ),
+              },
+              {
+                path: "nouveau",
+                name: "AddVocabulary",
+                component: () =>
+                  import(
+                    /* webpackChunkName: 'configuration' */ "../views/Vocabularies/Form.vue"
+                  ),
+              },
+              {
+                path: ":id",
+                name: "EditVocabulary",
+                beforeEnter: (to: RouteLocationNormalized): void | boolean => {
+                  if (to.params.id) {
+                    const $store = useStore();
+                    const vocabulary = $store.getters[
+                      VocabulariesGetterTypes.getVocabulary
+                    ](Number(to.params.id as string));
+                    if (!vocabulary) {
+                      return false;
+                    }
+                  }
+                },
+                component: () =>
+                  import(
+                    /* webpackChunkName: 'configuration' */ "../views/Vocabularies/Form.vue"
+                  ),
+              },
+            ],
           },
         ],
       },
@@ -129,20 +167,58 @@ const routes: Array<RouteRecordRaw> = [
             path: "vocabulaires",
             name: "VocabulariesExercise",
             component: () =>
-              import(
-                /* webpackChunkName: "exercises" */ "../views/Vocabularies.vue"
-              ),
-            beforeEnter: async (): Promise<void | boolean> => {
-              const continueRoute = await fetchData(
-                VocabularyActionTypes.getVocabularies,
-                VocabulariesGetterTypes.totalCount,
-                false,
-                true
-              );
-              if (!continueRoute) {
-                return continueRoute;
-              }
-            },
+              import(/* webpackChunkName: "exercises" */ "../views/Parent.vue"),
+            children: [
+              {
+                path: "",
+                name: "CategoriesExercise",
+                component: () =>
+                  import(
+                    /* webpackChunkName: "vocabularies" */ "../views/Categories.vue"
+                  ),
+                beforeEnter: async (): Promise<void | boolean> => {
+                  const continueRoute = await fetchData(
+                    VocabularyActionTypes.getCategories,
+                    VocabulariesGetterTypes.countCategories,
+                    true,
+                    true
+                  );
+                  if (!continueRoute) {
+                    return continueRoute;
+                  }
+                },
+              },
+              {
+                path: ":category_id(\\d+)",
+                name: "VocabularyExercise",
+                component: () =>
+                  import(
+                    /* webpackChunkName: "vocabularies" */ "../views/Vocabularies/Exercise.vue"
+                  ),
+                beforeEnter: async (
+                  to: RouteLocationNormalized
+                ): Promise<void | boolean> => {
+                  const $store = useStore();
+                  const category = $store.getters[
+                    VocabulariesGetterTypes.getCategory
+                  ](Number(to.params.category_id as string));
+
+                  if (!category) {
+                    return false;
+                  }
+
+                  const continueRoute = await fetchData(
+                    VocabularyActionTypes.getVocabularies,
+                    VocabulariesGetterTypes.totalCount,
+                    false,
+                    true
+                  );
+                  if (!continueRoute) {
+                    return continueRoute;
+                  }
+                },
+              },
+            ],
           },
           {
             path: "revision_erreurs",
@@ -155,6 +231,10 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
     ],
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/",
   },
 ];
 
