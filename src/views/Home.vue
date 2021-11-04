@@ -4,8 +4,8 @@
     :menu="true"
     :center="true"
   >
-    <Button to="/nl"> Néerlandais </Button>
-    <Button to="/en" disabled> Anglais </Button>
+    <Button to="/nl">Néerlandais</Button>
+    <Button to="/en">Anglais</Button>
   </MainContainer>
 </template>
 
