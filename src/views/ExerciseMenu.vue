@@ -25,23 +25,21 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "@vue/reactivity";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
+
+import { useStore } from "@/store";
+
 import MainContainer from "@/components/MainContainer.vue";
 import Button from "@/components/Button.vue";
 import Toast from "@/components/Toast.vue";
-import { useStore } from "@/store";
 
 const $store = useStore();
 const route = useRoute();
+
 const prefix = route.path;
-const { lang } = route.params;
 const toast = computed(() => {
   return $store.state.toast;
 });
-
-let language = "anglais";
-if (lang === "nl") {
-  language = "néerlandais";
-}
+const language = $store.getters.getLang;
 </script>

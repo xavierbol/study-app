@@ -117,7 +117,6 @@ import { useStore } from "@/store";
 import { UseExercise } from "@/hooks/useExercise";
 import { Vocabulary } from "@/models";
 import { ComputedRef, inject, reactive, ref, Ref } from "@vue/runtime-core";
-import { Language, useLang } from "@/hooks/useLang";
 
 const $route = useRoute();
 const $store = useStore();
@@ -159,7 +158,7 @@ function invalidField(fieldName: keyof Vocabulary) {
   );
 }
 
-const language = useLang($route.params.lang as Language);
+const language = $store.getters.getLang;
 
 function leaveExercise() {
   if (state.wrongAnswerCount > 0) {

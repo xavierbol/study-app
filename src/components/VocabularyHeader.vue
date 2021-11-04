@@ -11,10 +11,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useRoute } from "vue-router";
-import { Language } from "@/models";
-import { useLang } from "@/hooks/useLang";
+import { useStore } from "@/store";
 
-const $route = useRoute();
-const language = useLang($route.params.lang as Language);
+const $store = useStore();
+const language = $store.getters.getLang;
 </script>

@@ -1,5 +1,8 @@
 import { RouteLocationNormalized, RouteRecordRaw } from "vue-router";
+
+import { Language } from "@/models";
 import { useStore } from "@/store";
+import { MutationType } from "@/store/mutations";
 import { IrregularVerbActionTypes } from "@/store/irregular-verb/actions";
 import { IrregularVerbsGetterTypes } from "@/store/irregular-verb/getters";
 import { ToastActionTypes } from "@/store/toast/actions";
@@ -49,6 +52,10 @@ const routes: Array<RouteRecordRaw> = [
     path: "/:lang(nl|en)",
     component: () =>
       import(/* webpackChunkName: "home" */ "../views/Parent.vue"),
+    beforeEnter(to: RouteLocationNormalized): void | boolean {
+      const $store = useStore();
+      $store.commit(MutationType.setLang, to.params.lang as Language);
+    },
     children: [
       {
         path: "",

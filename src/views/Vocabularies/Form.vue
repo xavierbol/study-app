@@ -62,8 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLang } from "@/hooks/useLang";
-import { Vocabulary, Language } from "@/models";
+import { Vocabulary } from "@/models";
 import { VocabularyActionTypes } from "@/store/vocabulary/actions";
 import { VocabulariesGetterTypes } from "@/store/vocabulary/getters";
 import { computed, ComputedRef, reactive } from "@vue/reactivity";
@@ -77,7 +76,7 @@ const $store = useStore();
 const $router = useRouter();
 const $route = useRoute();
 
-const language = useLang($route.params.lang as Language);
+const language = $store.getters.getLang;
 const vocabulary: ComputedRef<Vocabulary> = computed(
   () =>
     $store.getters[VocabulariesGetterTypes.getVocabulary](
