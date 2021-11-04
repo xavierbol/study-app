@@ -1,8 +1,10 @@
 <template>
-  <tr class="nes-text is-error">
+  <tr class="nes-text is-error dashed-border-bottom">
     <td>{{ wrongIrregularVerb.infinitive }}</td>
     <td>
-      {{ wrongIrregularVerb.past_simple }} -
+      {{ wrongIrregularVerb.past_simple }}
+    </td>
+    <td>
       {{ wrongIrregularVerb.past_simple2 }}
     </td>
     <td>{{ wrongIrregularVerb.past_participle }}</td>
@@ -11,7 +13,9 @@
   <tr class="nes-text is-success">
     <td>{{ expectedIrregularVerb.infinitive }}</td>
     <td>
-      {{ expectedIrregularVerb.past_simple }} -
+      {{ expectedIrregularVerb.past_simple }}
+    </td>
+    <td>
       {{ expectedIrregularVerb.past_simple2 }}
     </td>
     <td>{{ expectedIrregularVerb.past_participle }}</td>

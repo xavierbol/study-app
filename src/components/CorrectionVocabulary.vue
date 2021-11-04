@@ -1,5 +1,8 @@
 <template>
-  <VocabularyRow class="nes-text is-error" :vocabulary="wrongVocabulary" />
+  <VocabularyRow
+    class="nes-text is-error dashed-border-bottom"
+    :vocabulary="wrongVocabulary"
+  />
   <VocabularyRow class="nes-text is-success" :vocabulary="expectedVocabulary" />
 </template>
 

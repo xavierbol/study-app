@@ -58,4 +58,9 @@
   width: 100%;
   margin-bottom: 3rem;
 }
+
+tr.dashed-border-bottom > td {
+  border-bottom: dashed;
+  border-color: black;
+}
 </style>

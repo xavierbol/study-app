@@ -5,7 +5,7 @@
     <td
       v-if="$route.params.category_id && $route.params.category_id === 'liste'"
     >
-      {{ category.name }}
+      {{ categoryName }}
     </td>
   </tr>
 </template>
@@ -19,16 +19,17 @@ import { VocabulariesGetterTypes } from "@/store/vocabulary/getters";
 
 const props = defineProps({
   vocabulary: {
-    type: Object as PropType<Vocabulary & { category: Category }>,
+    type: Object as PropType<Vocabulary & { category?: Category }>,
     required: true,
   },
 });
 
-const category =
+const categoryName =
   props.vocabulary.category ||
   useStore().getters[VocabulariesGetterTypes.getCategory](
     props.vocabulary.category_id as number
-  );
+  )?.name ||
+  "";
 
 const $emits = defineEmits(["click"]);
 </script>
