@@ -85,7 +85,7 @@ const routes: Array<RouteRecordRaw> = [
             name: "Categories",
             component: () =>
               import(
-                /* webpackChunkName: 'configuration' */ "../views/Categories.vue"
+                /* webpackChunkName: 'configuration' */ "../views/Categories/Menu.vue"
               ),
           },
           {
@@ -181,7 +181,7 @@ const routes: Array<RouteRecordRaw> = [
                 name: "CategoriesExercise",
                 component: () =>
                   import(
-                    /* webpackChunkName: "vocabularies" */ "../views/Categories.vue"
+                    /* webpackChunkName: "vocabularies" */ "../views/Categories/Menu.vue"
                   ),
                 beforeEnter: async (): Promise<void | boolean> => {
                   const continueRoute = await fetchData(

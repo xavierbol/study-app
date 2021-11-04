@@ -5,10 +5,7 @@
     :menu="true"
     :center="true"
   >
-    <Button
-      v-if="$route.name !== 'CategoriesExercise'"
-      :to="`${$route.path}/liste`"
-    >
+    <Button v-if="!isExercisePage" :to="`${$route.path}/liste`">
       Toutes les catégories
     </Button>
     <Button
@@ -18,7 +15,22 @@
     >
       {{ category.name }}
     </Button>
+    <Button
+      v-if="!isExercisePage"
+      color="danger"
+      :to="`${$route.path}/nouveau`"
+    >
+      Ajouter une nouvelle catégorie
+    </Button>
     <Button color="primary" @click="() => $router.back()">Retour</Button>
+    <Button
+      v-if="!isExercisePage"
+      color="danger"
+      :to="`${$route.path}/nouveau`"
+      float
+    >
+      <span>+</span>
+    </Button>
   </MainContainer>
 </template>
 
@@ -31,5 +43,6 @@ import MainContainer from "@/components/MainContainer.vue";
 
 const $store = useStore();
 const $route = useRoute();
+const isExercisePage = $route.name === "CategoriesExercise";
 const categories = $store.state.vocabulary.categories;
 </script>
