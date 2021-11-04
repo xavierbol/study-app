@@ -11,18 +11,25 @@ import { VocabulariesGetterTypes } from "@/store/vocabulary/getters";
 
 import Home from "../views/Home.vue";
 
-async function fetchData(
-  action: IrregularVerbActionTypes | VocabularyActionTypes,
-  getterName: IrregularVerbsGetterTypes | VocabulariesGetterTypes,
+type FetchDataParameters = {
+  action: IrregularVerbActionTypes | VocabularyActionTypes;
+  actionParams?: number;
+  getter: IrregularVerbsGetterTypes | VocabulariesGetterTypes;
+  fetch?: boolean;
+  requireData?: boolean;
+};
+
+async function fetchData({
+  action,
+  actionParams = undefined,
+  getter,
   fetch = false,
-  requireData = false
-): Promise<boolean> {
+  requireData = false,
+}: FetchDataParameters): Promise<boolean> {
   const $store = useStore();
-  let fetchData = false;
   try {
-    if (fetch || $store.getters[getterName] === 0) {
-      fetchData = true;
-      await $store.dispatch(action);
+    if (fetch || $store.getters[getter] === 0) {
+      await $store.dispatch(action, actionParams);
     }
   } catch (err) {
     console.error(err);
@@ -32,7 +39,7 @@ async function fetchData(
     );
     return false;
   }
-  if (requireData && fetchData && $store.getters[getterName] === 0) {
+  if (requireData && $store.getters[getter] === 0) {
     $store.dispatch(
       ToastActionTypes.show,
       "Aucune donnée n'a été récupérée pour lancer l'exercice, veuillez d'avoir ajouté des verbes/mots avant de lancer un exercice."
@@ -69,12 +76,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import(/* webpackChunkName: 'lang' */ "../views/Parent.vue"),
         beforeEnter: async (): Promise<void | boolean> => {
-          const continueRoute = await fetchData(
-            VocabularyActionTypes.getCategories,
-            VocabulariesGetterTypes.countCategories,
-            true,
-            true
-          );
+          const continueRoute = await fetchData({
+            action: VocabularyActionTypes.getCategories,
+            getter: VocabulariesGetterTypes.countCategories,
+            fetch: true,
+            requireData: true,
+          });
           if (!continueRoute) {
             return continueRoute;
           }
@@ -102,12 +109,30 @@ const routes: Array<RouteRecordRaw> = [
               import(
                 /* webpackChunkName: 'configuration' */ "../views/Parent.vue"
               ),
-            beforeEnter: async (): Promise<void | boolean> => {
-              const continueRoute = await fetchData(
-                VocabularyActionTypes.getVocabularies,
-                VocabulariesGetterTypes.totalCount,
-                true
-              );
+            beforeEnter: async (
+              to: RouteLocationNormalized
+            ): Promise<void | boolean> => {
+              const $store = useStore();
+              const categoryId =
+                to.params.category_id !== "liste"
+                  ? Number(to.params.category_id as string)
+                  : undefined;
+              const category = categoryId
+                ? $store.getters[VocabulariesGetterTypes.getCategory](
+                    Number(to.params.category_id as string)
+                  )
+                : null;
+
+              if (!category) {
+                return false;
+              }
+
+              const continueRoute = await fetchData({
+                action: VocabularyActionTypes.getVocabularies,
+                actionParams: categoryId,
+                getter: VocabulariesGetterTypes.totalCount,
+                fetch: true,
+              });
               if (!continueRoute) {
                 return continueRoute;
               }
@@ -166,12 +191,11 @@ const routes: Array<RouteRecordRaw> = [
                 /* webpackChunkName: "exercises" */ "../views/IrregularVerbs.vue"
               ),
             beforeEnter: async (): Promise<void | boolean> => {
-              const continueRoute = await fetchData(
-                IrregularVerbActionTypes.GetVerbs,
-                IrregularVerbsGetterTypes.totalCount,
-                false,
-                true
-              );
+              const continueRoute = await fetchData({
+                action: IrregularVerbActionTypes.GetVerbs,
+                getter: IrregularVerbsGetterTypes.totalCount,
+                requireData: true,
+              });
 
               if (!continueRoute) {
                 return continueRoute;
@@ -192,12 +216,12 @@ const routes: Array<RouteRecordRaw> = [
                     /* webpackChunkName: "vocabularies" */ "../views/Categories/Menu.vue"
                   ),
                 beforeEnter: async (): Promise<void | boolean> => {
-                  const continueRoute = await fetchData(
-                    VocabularyActionTypes.getCategories,
-                    VocabulariesGetterTypes.countCategories,
-                    true,
-                    true
-                  );
+                  const continueRoute = await fetchData({
+                    action: VocabularyActionTypes.getCategories,
+                    getter: VocabulariesGetterTypes.countCategories,
+                    fetch: true,
+                    requireData: true,
+                  });
                   if (!continueRoute) {
                     return continueRoute;
                   }
@@ -222,12 +246,12 @@ const routes: Array<RouteRecordRaw> = [
                     return false;
                   }
 
-                  const continueRoute = await fetchData(
-                    VocabularyActionTypes.getVocabularies,
-                    VocabulariesGetterTypes.totalCount,
-                    false,
-                    true
-                  );
+                  const continueRoute = await fetchData({
+                    action: VocabularyActionTypes.getVocabularies,
+                    actionParams: category.id,
+                    getter: VocabulariesGetterTypes.totalCount,
+                    requireData: true,
+                  });
                   if (!continueRoute) {
                     return continueRoute;
                   }

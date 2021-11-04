@@ -29,10 +29,10 @@ type AugmentedActionContext = {
 } & Omit<ActionContext<VocabularyState, State>, "commit">;
 
 export interface Actions {
-  [ActionTypes.getVocabularies]({
-    commit,
-    rootGetters,
-  }: AugmentedActionContext): Promise<void>;
+  [ActionTypes.getVocabularies](
+    { commit, rootGetters }: AugmentedActionContext,
+    categoryId?: number
+  ): Promise<void>;
   [ActionTypes.createVocabulary](
     { commit, rootGetters }: AugmentedActionContext,
     payload: Vocabulary
@@ -56,14 +56,16 @@ export interface Actions {
 }
 
 export const actions: ActionTree<VocabularyState, State> & Actions = {
-  async [ActionTypes.getVocabularies]({
-    commit,
-    rootGetters,
-  }: AugmentedActionContext) {
+  async [ActionTypes.getVocabularies](
+    { commit, rootGetters }: AugmentedActionContext,
+    categoryId?: number
+  ) {
     commit(MutationType.setLoading, true);
     try {
       const result: Response = await fetch(
-        rootGetters.getApiRoute(VOCABULARY_ROUTE),
+        rootGetters.getApiRoute(
+          `${categoryId ? CATEGORY_ROUTE : ""}${VOCABULARY_ROUTE}`
+        ),
         {
           method: "GET",
           headers,
