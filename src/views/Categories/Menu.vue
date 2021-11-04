@@ -32,6 +32,12 @@
       <span>+</span>
     </Button>
   </MainContainer>
+  <Toast
+    :show="toast.show"
+    :message="toast.message"
+    :position="toast.position"
+    color="error"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -40,9 +46,14 @@ import { useRoute } from "vue-router";
 
 import Button from "@/components/Button.vue";
 import MainContainer from "@/components/MainContainer.vue";
+import Toast from "@/components/Toast.vue";
+import { computed } from "@vue/reactivity";
 
 const $store = useStore();
 const $route = useRoute();
 const isExercisePage = $route.name === "CategoriesExercise";
 const categories = $store.state.vocabulary.categories;
+const toast = computed(() => {
+  return $store.state.toast;
+});
 </script>
