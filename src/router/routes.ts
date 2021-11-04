@@ -89,6 +89,14 @@ const routes: Array<RouteRecordRaw> = [
               ),
           },
           {
+            path: "nouveau",
+            name: "CreateCategory",
+            component: () =>
+              import(
+                /* webpackChunkName: 'configuration' */ "../views/Categories/Form.vue"
+              ),
+          },
+          {
             path: ":category_id(\\d+|liste)",
             component: () =>
               import(

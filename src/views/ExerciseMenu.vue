@@ -11,10 +11,10 @@
     <Button :to="`${prefix}/exercices/vocabulaires`">
       Vocabulaires en {{ language }}
     </Button>
-    <Button color="primary" :to="`${prefix}/vocabularies`">
+    <Button color="danger" :to="`${prefix}/vocabularies`">
       Voir la liste de vocabulaires
     </Button>
-    <Button color="secondary" @click="() => $router.back()">Retour</Button>
+    <Button color="primary" @click="() => $router.back()">Retour</Button>
   </MainContainer>
   <Toast
     :show="toast.show"

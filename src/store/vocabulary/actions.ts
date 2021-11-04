@@ -15,6 +15,7 @@ export enum ActionTypes {
   createVocabulary = "CREATE_VOCABULARY",
   updateVocabulary = "UPDATE_VOCABULARY",
   getCategories = "GET_CATEGORIES",
+  createCategory = "CREATE_CATEGORY",
 }
 
 type AugmentedActionContext = {
@@ -48,6 +49,10 @@ export interface Actions {
     commit,
     rootGetters,
   }: AugmentedActionContext): Promise<void>;
+  [ActionTypes.createCategory](
+    { commit, rootGetters }: AugmentedActionContext,
+    category: Category
+  ): Promise<void>;
 }
 
 export const actions: ActionTree<VocabularyState, State> & Actions = {
@@ -183,6 +188,35 @@ export const actions: ActionTree<VocabularyState, State> & Actions = {
       commit(MutationType.setLoading, false);
     }
   },
+  async [ActionTypes.createCategory](
+    { commit, rootGetters }: AugmentedActionContext,
+    category: Category
+  ) {
+    commit(MutationType.setLoading, true);
+    try {
+      const result: Response = await fetch(
+        rootGetters.getApiRoute(CATEGORY_ROUTE),
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify(category),
+        }
+      );
+      if (result.ok) {
+        const newCategory = (await result.json()) as Category;
+        commit(MutationType.createCategory, newCategory);
+      } else {
+        const error = await result.text();
+        console.error(error);
+        commit(MutationType.setError, error);
+      }
+    } catch (err) {
+      console.error(err);
+      commit(MutationType.setError, String(err));
+    } finally {
+      commit(MutationType.setLoading, false);
+    }
+  },
 };
 
 export enum VocabularyActionTypes {
@@ -190,6 +224,7 @@ export enum VocabularyActionTypes {
   deleteVocabulary = "vocabulary/DELETE_VOCABULARY",
   createVocabulary = "vocabulary/CREATE_VOCABULARY",
   updateVocabulary = "vocabulary/UPDATE_VOCABULARY",
+  createCategory = "vocabulary/CREATE_CATEGORY",
   getCategories = "vocabulary/GET_CATEGORIES",
 }
 
@@ -216,6 +251,10 @@ export interface VocabularyActions {
   [VocabularyActionTypes.updateVocabulary](
     { commit, rootGetters }: VocabularyAugmentedActionContext,
     payload: Partial<Vocabulary> & { id: number }
+  ): Promise<void>;
+  [VocabularyActionTypes.createCategory](
+    { commit, rootGetters }: VocabularyAugmentedActionContext,
+    payload: Category
   ): Promise<void>;
   [VocabularyActionTypes.getCategories]({
     commit,
