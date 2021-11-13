@@ -25,11 +25,12 @@ const props = defineProps({
 });
 
 const categoryName =
-  props.vocabulary.category ||
-  useStore().getters[VocabulariesGetterTypes.getCategory](
-    props.vocabulary.category_id as number
-  )?.name ||
-  "";
+  (
+    props.vocabulary.category ??
+    useStore().getters[VocabulariesGetterTypes.getCategory](
+      props.vocabulary.category_id as number
+    )
+  )?.name || "";
 
 const $emits = defineEmits(["click"]);
 </script>
