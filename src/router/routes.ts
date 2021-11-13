@@ -113,17 +113,17 @@ const routes: Array<RouteRecordRaw> = [
               to: RouteLocationNormalized
             ): Promise<void | boolean> => {
               const $store = useStore();
-              const categoryId =
-                to.params.category_id !== "liste"
-                  ? Number(to.params.category_id as string)
-                  : undefined;
+              const allCategories = to.params.category_id === "liste";
+              const categoryId = !allCategories
+                ? Number(to.params.category_id as string)
+                : undefined;
               const category = categoryId
                 ? $store.getters[VocabulariesGetterTypes.getCategory](
                     Number(to.params.category_id as string)
                   )
                 : null;
 
-              if (!category) {
+              if (!allCategories && !category) {
                 return false;
               }
 

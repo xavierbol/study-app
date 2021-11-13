@@ -64,7 +64,9 @@ export const actions: ActionTree<VocabularyState, State> & Actions = {
     try {
       const result: Response = await fetch(
         rootGetters.getApiRoute(
-          `${categoryId ? CATEGORY_ROUTE : ""}${VOCABULARY_ROUTE}`
+          `${
+            categoryId ? `${CATEGORY_ROUTE}/${categoryId}` : ""
+          }${VOCABULARY_ROUTE}`
         ),
         {
           method: "GET",
