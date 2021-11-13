@@ -86,6 +86,16 @@ Avec cette commande, un nouveau dossier sera généré contenant tout ce qui est
 
 ## TODO
 
+- [ ] Verbes irréguliers
+  - [ ] Ajouter une vue pour ajouter/modifier un verbe irrégulier
+  - [ ] Permettre la suppression d'un verbe irrégulier
+  - [ ] Gérer la possibilité de vérifier si l'utilisateur donne une bonne
+        réponse même si c'est le verbe écrit n'est pas celui attendu car il se
+        peut qu'on ait plusieurs mots pour une même traduction.
+- [ ] Vocabulaire
+  - [ ] Gestion des synonymes
+    - [ ] Ajoute une vue pour sélectionner un mot et ensuite tous ses synonymes.
+    - [ ] Permettre la suppression des synonymes
 - [ ] Catégorie
   - [ ] Ajouter une vue pour l'édition d'une catégorie,
   - [ ] Permettre la suppression d'une catégorie.
