@@ -91,7 +91,7 @@
     <p class="title text-center">Exercice terminé !</p>
     <p class="text-center">
       Vous venez de parcourir <br />
-      tous les verbes irréguliers <br />
+      tous les mots de vocabulaires <br />
       de cet exercice.
     </p>
     <p class="text-center" v-if="state.wrongAnswerCount > 0">
@@ -117,6 +117,7 @@ import { useStore } from "@/store";
 import { UseExercise } from "@/hooks/useExercise";
 import { Vocabulary } from "@/models";
 import { ComputedRef, inject, reactive, ref, Ref } from "@vue/runtime-core";
+import { ActionTypes } from "@/store/vocabulary/actions";
 
 const $route = useRoute();
 const $store = useStore();
@@ -161,11 +162,9 @@ function invalidField(fieldName: keyof Vocabulary) {
 const language = $store.getters.getLang;
 
 function leaveExercise() {
-  if (state.wrongAnswerCount > 0) {
-    if (dialogRef.value) {
-      dialogRef.value.showModal();
-      return;
-    }
+  if (state.wrongAnswerCount > 0 && dialogRef.value) {
+    dialogRef.value.showModal();
+    return;
   }
   $router.push("/");
 }
@@ -197,17 +196,16 @@ function onSubmit(): void {
       !checkAnswer(vocabularyForm.word, vocabulary.value.word)) ||
     (fieldName.value !== "translation" &&
       !checkAnswer(vocabularyForm.translation, vocabulary.value.translation));
+  if (fieldName.value === "translation" && showErrors.value) {
+    $store.dispatch(ActionTypes.checkAnswer);
+  }
   addAnswer({ ...vocabularyForm, correct: !showErrors.value });
   if (!showErrors.value) {
     if (remainingExercises.value > 0) {
       fieldName.value = selectRandomFieldName(vocabulary.value);
       onReset();
     } else {
-      if (dialogRef.value) {
-        dialogRef.value.showModal();
-      } else {
-        $router.push("/");
-      }
+      leaveExercise();
     }
   }
 }
