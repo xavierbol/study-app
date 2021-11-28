@@ -65,7 +65,7 @@ export function useExercise<T extends Exercise>(data?: T[]): UseExercise<T> {
   function selectRandomFieldName(record: T): keyof T {
     const fieldNames = (Object.keys(record) as Array<keyof T>).filter(
       (key) =>
-        !(["id", "language_id"] as Array<keyof T>).includes(key) && record[key]
+        !(["id", "category_id"] as Array<keyof T>).includes(key) && record[key]
     );
     return fieldNames[getRandomIndex(fieldNames.length)] as keyof T;
   }
