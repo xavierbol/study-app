@@ -11,9 +11,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, PropType } from "vue";
 import { Category, Vocabulary } from "@/models";
-import { PropType } from "@vue/runtime-core";
 import { useStore } from "@/store";
 import { VocabulariesGetterTypes } from "@/store/vocabulary/getters";
 

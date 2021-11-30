@@ -1,4 +1,3 @@
-import { IrregularVerb } from "@/models";
 import { getRoute } from "@/utils";
 import { GetterTree } from "vuex";
 import { State } from "./state";

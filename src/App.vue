@@ -63,4 +63,16 @@ tr.dashed-border-bottom > td {
   border-bottom: dashed;
   border-color: black;
 }
+
+.col-6 {
+  width: 50%;
+}
+
+.mr-2 {
+  margin-right: 2rem;
+}
+
+.buttons {
+  margin-top: 2rem;
+}
 </style>
