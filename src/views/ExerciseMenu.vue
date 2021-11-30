@@ -11,6 +11,9 @@
     <Button :to="`${prefix}/exercices/vocabulaires`">
       Vocabulaires en {{ language }}
     </Button>
+    <Button color="danger" :to="`${prefix}/irregular-verbs`">
+      Voir la liste de verbes irréguliers
+    </Button>
     <Button color="danger" :to="`${prefix}/vocabularies`">
       Voir la liste de vocabulaires
     </Button>

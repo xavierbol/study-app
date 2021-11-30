@@ -311,18 +311,6 @@ function onReturnMenu() {
 </script>
 
 <style lang="scss" scoped>
-.buttons {
-  margin-top: 3rem;
-}
-
-.col-6 {
-  width: 50%;
-}
-
-.mr-2 {
-  margin-right: 2rem;
-}
-
 .dialog {
   bottom: 50%;
 }

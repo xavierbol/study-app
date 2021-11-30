@@ -9,9 +9,10 @@ import { Getters } from "../getters";
 const IRREGULAR_VERB_ROUTE = "/irregular_verbs";
 
 export enum ActionTypes {
-  GetVerbs = "GET_VERBS",
-  DeleteVerb = "DELETE_VERB",
-  CreateVerb = "CREATE_VERB",
+  getVerbs = "GET_VERBS",
+  deleteVerb = "DELETE_VERB",
+  createVerb = "CREATE_VERB",
+  updateVerb = "UPDATE_VERB",
 }
 
 type AugmentedActionContext = {
@@ -25,22 +26,26 @@ type AugmentedActionContext = {
 } & Omit<ActionContext<IrregularVerbState, State>, "commit" | "rootGetters">;
 
 export interface Actions {
-  [ActionTypes.GetVerbs]({
+  [ActionTypes.getVerbs]({
     commit,
     rootGetters,
   }: AugmentedActionContext): Promise<void>;
-  [ActionTypes.CreateVerb](
+  [ActionTypes.createVerb](
     { commit, rootGetters }: AugmentedActionContext,
     payload: IrregularVerb
   ): Promise<void>;
-  [ActionTypes.DeleteVerb](
+  [ActionTypes.deleteVerb](
     { commit, rootGetters }: AugmentedActionContext,
     payload: number
+  ): Promise<void>;
+  [ActionTypes.updateVerb](
+    { commit, rootGetters }: AugmentedActionContext,
+    payload: Partial<IrregularVerb> & { id: number }
   ): Promise<void>;
 }
 
 export const actions: ActionTree<IrregularVerbState, State> & Actions = {
-  async [ActionTypes.GetVerbs]({ commit, rootGetters }) {
+  async [ActionTypes.getVerbs]({ commit, rootGetters }) {
     commit(MutationType.setLoading, true);
     try {
       const result: Response = await fetch(
@@ -64,7 +69,7 @@ export const actions: ActionTree<IrregularVerbState, State> & Actions = {
       commit(MutationType.setLoading, false);
     }
   },
-  async [ActionTypes.CreateVerb]({ commit, rootGetters }, verb: IrregularVerb) {
+  async [ActionTypes.createVerb]({ commit, rootGetters }, verb: IrregularVerb) {
     commit(MutationType.setLoading, true);
     try {
       const result: Response = await fetch(
@@ -91,7 +96,35 @@ export const actions: ActionTree<IrregularVerbState, State> & Actions = {
       commit(MutationType.setLoading, false);
     }
   },
-  async [ActionTypes.DeleteVerb]({ commit, rootGetters }, verbId: number) {
+  async [ActionTypes.updateVerb](
+    { commit, rootGetters },
+    updatedVerb: Partial<IrregularVerb> & { id: number }
+  ): Promise<void> {
+    commit(MutationType.setLoading, true);
+    try {
+      const result: Response = await fetch(
+        rootGetters.getApiRoute(`${IRREGULAR_VERB_ROUTE}/${updatedVerb.id}`),
+        {
+          method: "PUT",
+          headers,
+        }
+      );
+
+      if (result.ok && result.status === 203) {
+        commit(MutationType.updateIrregularVerb, await result.json());
+      } else {
+        const error = await result.text();
+        console.error(error);
+        commit(MutationType.setError, error);
+      }
+    } catch (err) {
+      console.error(err);
+      commit(MutationType.setError, String(err));
+    } finally {
+      commit(MutationType.setLoading, false);
+    }
+  },
+  async [ActionTypes.deleteVerb]({ commit, rootGetters }, verbId: number) {
     commit(MutationType.setLoading, true);
     try {
       const result: Response = await fetch(
@@ -119,9 +152,10 @@ export const actions: ActionTree<IrregularVerbState, State> & Actions = {
 };
 
 export enum IrregularVerbActionTypes {
-  GetVerbs = "irregularVerb/GET_VERBS",
-  DeleteVerb = "irregularVerb/DELETE_VERB",
-  CreateVerb = "irregularVerb/CREATE_VERB",
+  getVerbs = "irregularVerb/GET_VERBS",
+  createVerb = "irregularVerb/CREATE_VERB",
+  updateVerb = "irregularVerb/UPDATE_VERB",
+  deleteVerb = "irregularVerb/DELETE_VERB",
 }
 
 type IrregularVerbAugmentedActionContext = {
@@ -132,14 +166,18 @@ type IrregularVerbAugmentedActionContext = {
 } & Omit<ActionContext<IrregularVerbState, State>, "commit">;
 
 export interface IrregularVerbActions {
-  [IrregularVerbActionTypes.GetVerbs]({
+  [IrregularVerbActionTypes.getVerbs]({
     commit,
   }: IrregularVerbAugmentedActionContext): Promise<void>;
-  [IrregularVerbActionTypes.CreateVerb](
+  [IrregularVerbActionTypes.createVerb](
     { commit }: IrregularVerbAugmentedActionContext,
     payload: IrregularVerb
   ): Promise<void>;
-  [IrregularVerbActionTypes.DeleteVerb](
+  [IrregularVerbActionTypes.updateVerb](
+    { commit, rootGetters }: IrregularVerbAugmentedActionContext,
+    payload: Partial<IrregularVerb> & { id: number }
+  ): Promise<void>;
+  [IrregularVerbActionTypes.deleteVerb](
     { commit }: IrregularVerbAugmentedActionContext,
     payload: number
   ): Promise<void>;

@@ -71,11 +71,65 @@ const routes: Array<RouteRecordRaw> = [
           import(/* webpackChunkName: "home" */ "../views/ExerciseMenu.vue"),
       },
       {
+        path: "irregular-verbs",
+        name: "IrregularVerbs",
+        component: () =>
+          import(/* webpackChunkName: 'lang' */ "../views/Parent.vue"),
+        beforeEnter: async (): Promise<void | false> => {
+          const continueRoute = await fetchData({
+            action: IrregularVerbActionTypes.getVerbs,
+            getter: IrregularVerbsGetterTypes.totalCount,
+            fetch: true,
+            requireData: false,
+          });
+          if (!continueRoute) {
+            return continueRoute;
+          }
+        },
+        children: [
+          {
+            path: "",
+            name: "IrregularVerbsList",
+            component: () =>
+              import(
+                /* webpackChunkName: 'irregular-verb' */ "../views/IrregularVerbs/List.vue"
+              ),
+          },
+          {
+            path: "nouveau",
+            name: "IrregularVerbCreation",
+            component: () =>
+              import(
+                /* webpackChunkName: 'irregular-verb' */ "../views/IrregularVerbs/Form.vue"
+              ),
+          },
+          {
+            path: ":id",
+            name: "EditIrregularVerb",
+            component: () =>
+              import(
+                /* webpackChunkName: 'irregular-verb' */ "../views/IrregularVerbs/Form.vue"
+              ),
+            beforeEnter: (to: RouteLocationNormalized): void | boolean => {
+              if (to.params.id) {
+                const $store = useStore();
+                const irregularVerb = $store.getters[
+                  IrregularVerbsGetterTypes.getVerb
+                ](Number(to.params.id as string));
+                if (!irregularVerb) {
+                  return false;
+                }
+              }
+            },
+          },
+        ],
+      },
+      {
         path: "vocabularies",
         name: "Vocabularies",
         component: () =>
           import(/* webpackChunkName: 'lang' */ "../views/Parent.vue"),
-        beforeEnter: async (): Promise<void | boolean> => {
+        beforeEnter: async (): Promise<void | false> => {
           const continueRoute = await fetchData({
             action: VocabularyActionTypes.getCategories,
             getter: VocabulariesGetterTypes.countCategories,
@@ -188,11 +242,11 @@ const routes: Array<RouteRecordRaw> = [
             name: "IrregularVerbsExercise",
             component: () =>
               import(
-                /* webpackChunkName: "exercises" */ "../views/IrregularVerbs.vue"
+                /* webpackChunkName: "exercises" */ "../views/IrregularVerbs/Exercise.vue"
               ),
             beforeEnter: async (): Promise<void | boolean> => {
               const continueRoute = await fetchData({
-                action: IrregularVerbActionTypes.GetVerbs,
+                action: IrregularVerbActionTypes.getVerbs,
                 getter: IrregularVerbsGetterTypes.totalCount,
                 requireData: true,
               });
