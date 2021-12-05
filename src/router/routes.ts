@@ -248,6 +248,7 @@ const routes: Array<RouteRecordRaw> = [
               const continueRoute = await fetchData({
                 action: IrregularVerbActionTypes.getVerbs,
                 getter: IrregularVerbsGetterTypes.totalCount,
+                fetch: true,
                 requireData: true,
               });
 
@@ -304,6 +305,7 @@ const routes: Array<RouteRecordRaw> = [
                     action: VocabularyActionTypes.getVocabularies,
                     actionParams: category.id,
                     getter: VocabulariesGetterTypes.totalCount,
+                    fetch: true,
                     requireData: true,
                   });
                   if (!continueRoute) {
