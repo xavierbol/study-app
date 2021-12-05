@@ -149,6 +149,7 @@ export const actions: ActionTree<VocabularyState, State> & Actions = {
         {
           method: "PUT",
           headers,
+          body: JSON.stringify(vocabularyUpdated),
         }
       );
 
