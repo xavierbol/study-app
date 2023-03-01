@@ -20,7 +20,7 @@
       color="danger"
       :to="`${$route.path}/nouveau`"
     >
-      Ajouter une nouvelle catégorie
+      Créer
     </Button>
     <Button color="primary" @click="() => $router.back()">Retour</Button>
     <Button

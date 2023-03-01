@@ -76,10 +76,10 @@ const btnClass = computed(() => {
   }
 
   if (props.float) {
-    className += " float-btn";
+    className += ` float-btn position_${props.position}`;
   }
 
-  return `nes-btn ${className} position_${props.position}`.trimEnd();
+  return `nes-btn ${className} `.trimEnd();
 });
 </script>
 

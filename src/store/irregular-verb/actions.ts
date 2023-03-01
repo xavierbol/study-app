@@ -1,7 +1,7 @@
 import { ActionContext, ActionTree } from "vuex";
 import { IrregularVerbMutations, Mutations, MutationType } from "./mutations";
 import { IrregularVerbState } from "./state";
-import { IrregularVerb } from "@/models";
+import { Answer, IrregularVerb } from "@/models";
 import { headers } from "@/utils";
 import { State } from "../state";
 import { Getters } from "../getters";
@@ -13,6 +13,7 @@ export enum ActionTypes {
   deleteVerb = "DELETE_VERB",
   createVerb = "CREATE_VERB",
   updateVerb = "UPDATE_VERB",
+  checkAnswer = "CHECK_ANSWER",
 }
 
 type AugmentedActionContext = {
@@ -42,6 +43,10 @@ export interface Actions {
     { commit, rootGetters }: AugmentedActionContext,
     payload: Partial<IrregularVerb> & { id: number }
   ): Promise<void>;
+  [ActionTypes.checkAnswer](
+    { commit, rootGetters }: AugmentedActionContext,
+    payload: Answer<IrregularVerb>
+  ): Promise<IrregularVerb | string>;
 }
 
 export const actions: ActionTree<IrregularVerbState, State> & Actions = {
@@ -107,11 +112,12 @@ export const actions: ActionTree<IrregularVerbState, State> & Actions = {
         {
           method: "PUT",
           headers,
+          body: JSON.stringify(updatedVerb),
         }
       );
 
-      if (result.ok && result.status === 203) {
-        commit(MutationType.updateIrregularVerb, await result.json());
+      if (result.ok && result.status === 204) {
+        commit(MutationType.updateIrregularVerb, await updatedVerb);
       } else {
         const error = await result.text();
         console.error(error);
@@ -149,6 +155,22 @@ export const actions: ActionTree<IrregularVerbState, State> & Actions = {
       commit(MutationType.setLoading, false);
     }
   },
+  async [ActionTypes.checkAnswer](
+    { commit, rootGetters },
+    answer: Answer<IrregularVerb>
+  ): Promise<IrregularVerb | string> {
+    return "";
+    // commit(MutationType.setLoading, true);
+    // try {
+    //   const result: Response = await fetch(rootGetters.getApiRoute(), {
+    //     method: "GET",
+    //     headers,
+    //   });
+    // } catch (err) {
+    //   console.error(err);
+    //   return err;
+    // }
+  },
 };
 
 export enum IrregularVerbActionTypes {
@@ -156,6 +178,7 @@ export enum IrregularVerbActionTypes {
   createVerb = "irregularVerb/CREATE_VERB",
   updateVerb = "irregularVerb/UPDATE_VERB",
   deleteVerb = "irregularVerb/DELETE_VERB",
+  checkAnswer = "irregularVerb/CHECK_ANSWER",
 }
 
 type IrregularVerbAugmentedActionContext = {
@@ -181,4 +204,8 @@ export interface IrregularVerbActions {
     { commit }: IrregularVerbAugmentedActionContext,
     payload: number
   ): Promise<void>;
+  [IrregularVerbActionTypes.checkAnswer](
+    { commit }: IrregularVerbAugmentedActionContext,
+    payload: Answer<IrregularVerb>
+  ): Promise<IrregularVerb | string>;
 }

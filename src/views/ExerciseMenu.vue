@@ -1,22 +1,26 @@
 <template>
   <MainContainer
     title="Study App"
-    question="Que souhaitez-vous faire ?"
+    :question="`Que souhaitez-vous faire en ${language} ?`"
     :menu="true"
     :center="true"
   >
-    <Button :to="`${prefix}/exercices/verbe-irreguliers`">
-      Verbes irréguliers en {{ language }}
-    </Button>
-    <Button :to="`${prefix}/exercices/vocabulaires`">
-      Vocabulaires en {{ language }}
-    </Button>
-    <Button color="danger" :to="`${prefix}/irregular-verbs`">
-      Voir la liste de verbes irréguliers
-    </Button>
-    <Button color="danger" :to="`${prefix}/vocabularies`">
-      Voir la liste de vocabulaires
-    </Button>
+    <div class="flex flex-column justify-evenly h-full items-center mb-1">
+      <h2>Exercices</h2>
+      <Button :to="`${prefix}/exercices/verbe-irreguliers`">
+        Verbes irréguliers
+      </Button>
+      <Button :to="`${prefix}/exercices/vocabulaires`">Vocabulaires</Button>
+    </div>
+    <div class="flex flex-column justify-evenly h-full items-center">
+      <h2>Consulter les données</h2>
+      <Button color="danger" :to="`${prefix}/irregular-verbs`">
+        Verbes irréguliers
+      </Button>
+      <Button color="danger" :to="`${prefix}/vocabularies`">
+        Vocabulaires
+      </Button>
+    </div>
     <Button color="primary" @click="() => $router.back()">Retour</Button>
   </MainContainer>
   <Toast

@@ -1,4 +1,4 @@
-import { Category, Vocabulary } from "@/models";
+import { Answer, Category, Exercise, Vocabulary } from "@/models";
 import { headers } from "@/utils";
 import { ActionContext, ActionTree } from "vuex";
 import { Getters } from "../getters";
@@ -16,6 +16,7 @@ export enum ActionTypes {
   updateVocabulary = "UPDATE_VOCABULARY",
   getCategories = "GET_CATEGORIES",
   createCategory = "CREATE_CATEGORY",
+  checkAnswer = "CHECK_ANSWER",
 }
 
 type AugmentedActionContext = {
@@ -53,6 +54,10 @@ export interface Actions {
     { commit, rootGetters }: AugmentedActionContext,
     category: Category
   ): Promise<void>;
+  [ActionTypes.checkAnswer](
+    { commit, rootGetters }: AugmentedActionContext,
+    payload: Answer<Vocabulary>
+  ): Promise<Vocabulary | string>;
 }
 
 export const actions: ActionTree<VocabularyState, State> & Actions = {
@@ -222,6 +227,24 @@ export const actions: ActionTree<VocabularyState, State> & Actions = {
       commit(MutationType.setLoading, false);
     }
   },
+  async [ActionTypes.checkAnswer](
+    { commit, rootGetters }: AugmentedActionContext,
+    answer: Answer<Vocabulary>
+  ) {
+    commit(MutationType.setLoading, true);
+    try {
+      const result: Response = await fetch(rootGetters.getApiRoute());
+      if (result.ok) {
+        const error = (await result.json()) as Vocabulary;
+        console.error(error);
+        return error;
+      }
+      return await result.text();
+    } catch (err) {
+      console.error(err);
+      return String(err);
+    }
+  },
 };
 
 export enum VocabularyActionTypes {
@@ -231,6 +254,7 @@ export enum VocabularyActionTypes {
   updateVocabulary = "vocabulary/UPDATE_VOCABULARY",
   createCategory = "vocabulary/CREATE_CATEGORY",
   getCategories = "vocabulary/GET_CATEGORIES",
+  checkAnswer = "vocabulary/CHECK_ANSWER",
 }
 
 type VocabularyAugmentedActionContext = {
@@ -265,4 +289,8 @@ export interface VocabularyActions {
     commit,
     rootGetters,
   }: VocabularyAugmentedActionContext): Promise<void>;
+  [VocabularyActionTypes.checkAnswer](
+    { commit, rootGetters }: VocabularyAugmentedActionContext,
+    answer: Answer<Vocabulary>
+  ): Promise<Vocabulary | string>;
 }

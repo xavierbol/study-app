@@ -1,8 +1,11 @@
 <template>
   <MainContainer title="Liste de verbes irréguliers">
-    <Button class="returnBtn" color="primary" @click="() => $router.back()">
-      Retour
-    </Button>
+    <div class="buttons flex justify-between">
+      <Button class="returnBtn" color="primary" @click="() => $router.back()">
+        Retour
+      </Button>
+      <Button color="danger" :to="`${$route.path}/nouveau`"> + Ajouter </Button>
+    </div>
     <div class="nes-table-responsive">
       <table class="nes-table is-bordered">
         <thead>
@@ -18,7 +21,7 @@
         </tbody>
       </table>
       <Button class="addBtn" color="danger" :to="`${$route.path}/nouveau`">
-        + Ajouter un nouveau verbe irrégulier
+        + Ajouter
       </Button>
     </div>
     <Button color="danger" :to="`${$route.path}/nouveau`" float>
@@ -40,8 +43,16 @@ const irregularVerbs = $store.state.irregularVerb.verbs;
 </script>
 
 <style lang="scss" scoped>
-.returnBtn {
+.buttons {
   margin-bottom: 2rem;
+
+  > * {
+    margin-right: 2rem;
+  }
+
+  > :last-child {
+    margin-right: 0;
+  }
 }
 
 .addBtn {

@@ -1,113 +1,122 @@
 <template>
-  <h1 class="title">Vocabulaires en {{ language }}</h1>
-  <form @submit.prevent="onSubmit" @reset.prevent="onReset" autocomplete="off">
-    <div class="row">
-      <div class="nes-field w-full">
-        <label for="word">Mot en {{ language }}</label>
-        <input
-          v-model.trim="vocabularyForm.word"
-          type="text"
-          name="word"
-          :class="`nes-input ${
-            showErrors && fieldName !== 'word'
-              ? invalidField('word')
-                ? 'is-error'
-                : 'is-success'
-              : ''
-          }`"
-          :disabled="fieldName === 'word'"
-        />
-        <span class="nes-text is-error" v-if="invalidField('word')">
-          Mot correct : {{ vocabulary.word }}
+  <MainContainer :title="`Vocabulaires en ${language}`">
+    <form
+      @submit.prevent="onSubmit"
+      @reset.prevent="onReset"
+      autocomplete="off"
+    >
+      <div class="row">
+        <div class="nes-field w-full">
+          <label for="word">Mot en {{ language }}</label>
+          <input
+            v-model.trim="vocabularyForm.word"
+            type="text"
+            name="word"
+            :class="`nes-input ${
+              showErrors && fieldName !== 'word'
+                ? invalidField('word')
+                  ? 'is-error'
+                  : 'is-success'
+                : ''
+            }`"
+            :disabled="fieldName === 'word'"
+          />
+          <span class="nes-text is-error" v-if="invalidField('word')">
+            Mot correct : {{ vocabulary.word }}
+          </span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="nes-field w-full">
+          <label for="translation">Traduction</label>
+          <input
+            v-model.trim="vocabularyForm.translation"
+            type="text"
+            name="translation"
+            :class="`nes-input ${
+              showErrors && fieldName !== 'translation'
+                ? invalidField('translation')
+                  ? 'is-error'
+                  : 'is-success'
+                : ''
+            }`"
+            :disabled="fieldName === 'translation'"
+          />
+          <span class="nes-text is-error" v-if="invalidField('translation')">
+            Traduction correcte : {{ vocabulary.translation }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex justify-around buttons">
+        <Button type="submit" color="success">Valider</Button>
+        <Button type="button" color="primary" @click="leaveExercise">
+          Quitter
+        </Button>
+        <Button type="reset" color="danger">Réinitialiser</Button>
+      </div>
+    </form>
+    <div class="flex justify-between">
+      <div v-if="totalExercises - remainingExercises <= 10">
+        <i
+          v-for="i in state.goodAnswerCount"
+          class="nes-icon coin"
+          :key="i"
+        ></i>
+        <i
+          v-for="i in state.wrongAnswerCount"
+          class="nes-icon close"
+          :key="i"
+        ></i>
+      </div>
+      <div v-else>
+        <span v-if="state.goodAnswerCount > 0" class="nes-text">
+          <i class="nes-icon coin"></i> x
+          {{ state.goodAnswerCount }}
+        </span>
+        <span v-if="state.wrongAnswerCount > 0" class="nes-text">
+          <i class="nes-icon close"></i> x
+          {{ state.wrongAnswerCount }}
         </span>
       </div>
-    </div>
-
-    <div class="row">
-      <div class="nes-field w-full">
-        <label for="translation">Traduction</label>
-        <input
-          v-model.trim="vocabularyForm.translation"
-          type="text"
-          name="translation"
-          :class="`nes-input ${
-            showErrors && fieldName !== 'translation'
-              ? invalidField('translation')
-                ? 'is-error'
-                : 'is-success'
-              : ''
-          }`"
-          :disabled="fieldName === 'translation'"
-        />
-        <span class="nes-text is-error" v-if="invalidField('translation')">
-          Traduction correcte : {{ vocabulary.translation }}
-        </span>
-      </div>
-    </div>
-
-    <div class="flex justify-around buttons">
-      <Button type="submit" color="success">Valider</Button>
-      <Button type="button" color="primary" @click="leaveExercise">
-        Quitter
-      </Button>
-      <Button type="reset" color="danger">Réinitialiser</Button>
-    </div>
-  </form>
-  <div class="flex justify-between">
-    <div v-if="totalExercises - remainingExercises <= 10">
-      <i v-for="i in state.goodAnswerCount" class="nes-icon coin" :key="i"></i>
-      <i
-        v-for="i in state.wrongAnswerCount"
-        class="nes-icon close"
-        :key="i"
-      ></i>
-    </div>
-    <div v-else>
-      <span v-if="state.goodAnswerCount > 0" class="nes-text">
-        <i class="nes-icon coin"></i> x
-        {{ state.goodAnswerCount }}
-      </span>
-      <span v-if="state.wrongAnswerCount > 0" class="nes-text">
-        <i class="nes-icon close"></i> x
-        {{ state.wrongAnswerCount }}
+      <span class="nes-text">
+        {{
+          `${
+            remainingExercises >= totalExercises
+              ? totalExercises - remainingExercises
+              : totalExercises - remainingExercises + 1
+          } / ${totalExercises}`
+        }}
       </span>
     </div>
-    <span class="nes-text">
-      {{
-        `${
-          remainingExercises >= totalExercises
-            ? totalExercises - remainingExercises
-            : totalExercises - remainingExercises + 1
-        } / ${totalExercises}`
-      }}
-    </span>
-  </div>
 
-  <dialog
-    ref="dialogRef"
-    class="nes-dialog is-rounded dialog"
-    id="dialog-dark-rounded"
-  >
-    <p class="title text-center">Exercice terminé !</p>
-    <p class="text-center">
-      Vous venez de parcourir <br />
-      tous les mots de vocabulaires <br />
-      de cet exercice.
-    </p>
-    <p class="text-center" v-if="state.wrongAnswerCount > 0">
-      Voulez-vous réviser vos erreurs ?
-    </p>
-    <menu class="dialog-menu flex justify-around">
-      <Button
-        v-if="state.wrongAnswerCount > 0"
-        color="primary"
-        @click="onResumeErrors"
-      >
-        Oui
-      </Button>
-      <Button color="secondary" to="/">Non</Button>
-    </menu>
-  </dialog>
+    <dialog
+      ref="dialogRef"
+      class="nes-dialog is-rounded dialog"
+      id="dialog-dark-rounded"
+    >
+      <p class="title text-center">Exercice terminé !</p>
+      <p class="text-center">
+        Vous venez de parcourir <br />
+        tous les mots de vocabulaires <br />
+        de cet exercice.
+      </p>
+      <p class="text-center" v-if="state.wrongAnswerCount > 0">
+        Voulez-vous réviser vos erreurs ?
+      </p>
+      <menu class="dialog-menu flex justify-around">
+        <Button
+          v-if="state.wrongAnswerCount > 0"
+          color="primary"
+          @click="onResumeErrors"
+        >
+          Oui
+        </Button>
+        <Button color="secondary" to="/">Non</Button>
+      </menu>
+    </dialog>
+  </MainContainer>
 </template>
 
 <script lang="ts" setup>
@@ -118,6 +127,7 @@ import { UseExercise } from "@/hooks/useExercise";
 import { Vocabulary } from "@/models";
 import { ComputedRef, inject, reactive, ref, Ref } from "@vue/runtime-core";
 import { ActionTypes } from "@/store/vocabulary/actions";
+import MainContainer from "@/components/MainContainer.vue";
 
 const $route = useRoute();
 const $store = useStore();
@@ -222,18 +232,6 @@ function onReturnMenu() {
 </script>
 
 <style lang="scss" scoped>
-.buttons {
-  margin-top: 3rem;
-}
-
-.col-6 {
-  width: 50%;
-}
-
-.mr-2 {
-  margin-right: 2rem;
-}
-
 .dialog {
   bottom: 50%;
 }

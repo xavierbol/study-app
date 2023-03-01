@@ -113,6 +113,9 @@ if (irregularVerb.value) {
   editMode = true;
   irregularVerbForm.id = irregularVerb.value.id;
   irregularVerbForm.infinitive = irregularVerb.value.infinitive;
+  irregularVerbForm.past_simple = irregularVerb.value.past_simple;
+  irregularVerbForm.past_simple2 = irregularVerb.value.past_simple2;
+  irregularVerbForm.past_participle = irregularVerb.value.past_participle;
   irregularVerbForm.translation = irregularVerb.value.translation;
 }
 
